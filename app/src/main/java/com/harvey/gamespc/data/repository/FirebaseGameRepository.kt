@@ -44,7 +44,7 @@ class FirebaseGameRepository(
     /**
      * Un método adicional para obtener el tamaño de archivo de forma aislada.
      */
-    suspend fun fetchItemFileSize(downloadUrl: String): String? {
+    override suspend fun fetchItemFileSize(downloadUrl: String): String? {
         return FileSizeFetcher.getFileSize(downloadUrl)
     }
 }

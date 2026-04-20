@@ -11,8 +11,9 @@ interface GameRepository {
     fun getAllGames(): Flow<Result<List<GameTable>>>
 
     /**
-     * (Opcional) Podrías añadir métodos para buscar, obtener por ID, etc.
+     * Obtiene el tamaño de un archivo dado su URL.
      */
+    suspend fun fetchItemFileSize(downloadUrl: String): String?
 }
 
 /**
