@@ -1,7 +1,7 @@
 [versions]
 agp = "8.13.0"
 
-kotlin = "2.2.0"
+kotlin = "2.1.0"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -39,7 +39,7 @@ ui = "1.9.1"
 media3 = "1.4.0"
 emoji2Emojipicker = "1.6.0"
 hilt = "2.51.1"
-ksp = "2.2.0-1.0.33"
+ksp = "2.1.0-1.0.29"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
