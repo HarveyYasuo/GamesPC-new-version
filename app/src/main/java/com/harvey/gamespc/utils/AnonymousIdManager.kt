@@ -11,8 +11,10 @@ import javax.inject.Singleton
 class AnonymousIdManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    private const val PREFS_NAME = "AppPrefs"
-    private const val KEY_UNIQUE_ID = "unique_id"
+    companion object {
+        private const val PREFS_NAME = "AppPrefs"
+        private const val KEY_UNIQUE_ID = "unique_id"
+    }
 
     private fun getPreferences(): SharedPreferences {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
