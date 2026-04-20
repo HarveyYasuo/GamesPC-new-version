@@ -34,7 +34,9 @@ import com.harvey.gamespc.ui.theme.GamesPCTheme
 import com.harvey.gamespc.ui.version.VersionCheckState
 import com.harvey.gamespc.ui.version.VersionViewModel
 import com.harvey.gamespc.utils.ProvideSafeFocusManager
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private lateinit var consentInformation: ConsentInformation

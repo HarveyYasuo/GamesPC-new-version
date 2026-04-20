@@ -17,9 +17,11 @@ import com.google.android.gms.ads.MobileAds
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.harvey.gamespc.notifications.NotificationWorker
 import com.harvey.gamespc.utils.PresenceManager
+import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
 import okio.Path.Companion.toOkioPath
 
+@HiltAndroidApp
 class MyApplication : Application(), SingletonImageLoader.Factory, LifecycleEventObserver {
 
     companion object {

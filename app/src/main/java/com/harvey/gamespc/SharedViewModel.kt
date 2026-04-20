@@ -6,20 +6,21 @@ import android.os.Bundle
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.database.FirebaseDatabase
 import com.harvey.gamespc.data.GameTable
+import com.harvey.gamespc.data.repository.FirebaseGameRepository
 import com.harvey.gamespc.utils.DownloadStatus
-import com.harvey.gamespc.utils.FileSizeFetcher
 import com.harvey.gamespc.utils.MediafireDownloader
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
-import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
-class SharedViewModel(
+@HiltViewModel
+class SharedViewModel @Inject constructor(
     application: Application,
-    private val repository: FirebaseGameRepository = FirebaseGameRepository()
+    private val repository: FirebaseGameRepository
 ) : AndroidViewModel(application) {
 
     private val _items = MutableStateFlow<List<GameTable>>(emptyList())
