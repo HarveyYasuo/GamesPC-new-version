@@ -3,14 +3,19 @@ package com.harvey.gamespc.ui.version
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.database.FirebaseDatabase
+import com.harvey.gamespc.data.repository.ConfigRepository
 import com.harvey.gamespc.utils.AppVersionUtils
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
-class VersionViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class VersionViewModel @Inject constructor(
+    application: Application,
+    private val configRepository: ConfigRepository
+) : AndroidViewModel(application) {
 
     private val _versionState = MutableStateFlow<VersionCheckState>(VersionCheckState.Loading)
     val versionState: StateFlow<VersionCheckState> = _versionState
@@ -22,7 +27,7 @@ class VersionViewModel(application: Application) : AndroidViewModel(application)
     private fun checkVersion() {
         viewModelScope.launch {
             try {
-                val minRequiredVersionCode = fetchMinVersionFromFirebase()
+                val minRequiredVersionCode = configRepository.getMinRequiredVersionCode()
                 val currentVersionCode = AppVersionUtils.getVersionCode(getApplication())
 
                 if (currentVersionCode < minRequiredVersionCode) {
@@ -39,12 +44,5 @@ class VersionViewModel(application: Application) : AndroidViewModel(application)
                 _versionState.value = VersionCheckState.Success
             }
         }
-    }
-
-    private suspend fun fetchMinVersionFromFirebase(): Long {
-        val database = FirebaseDatabase.getInstance()
-        val versionRef = database.getReference("config/version/minRequiredVersionCode")
-        val snapshot = versionRef.get().await()
-        return snapshot.getValue(Long::class.java) ?: -1
     }
 }

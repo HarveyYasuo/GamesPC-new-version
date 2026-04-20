@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -28,7 +28,7 @@ import com.harvey.gamespc.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatScreen(chatViewModel: ChatViewModel = viewModel()) {
+fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
     var messageText by remember { mutableStateOf("") }
     val messages by chatViewModel.messages.collectAsState()
     val currentUserId = chatViewModel.currentUserId

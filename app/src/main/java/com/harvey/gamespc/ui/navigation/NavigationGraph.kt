@@ -6,7 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -49,14 +49,11 @@ fun NavigationGraph(
                 navArgument("categoryName") { type = NavType.StringType }
             )
         ) {
-            val itemId = it.arguments?.getString("itemId")
-            val categoryName = it.arguments?.getString("categoryName")
-
-            if (itemId != null && categoryName != null) {
-                val detailViewModelFactory = DetailViewModel.Factory(itemId, categoryName, sharedViewModel)
-                val detailViewModel: DetailViewModel = viewModel(factory = detailViewModelFactory)
-                DetailScreen(detailViewModel = detailViewModel)
-            }
+            val detailViewModel: DetailViewModel = hiltViewModel()
+            DetailScreen(
+                detailViewModel = detailViewModel,
+                onPipModeChanged = { sharedViewModel.setPipMode(it) }
+            )
         }
     }
 }

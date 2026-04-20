@@ -55,12 +55,15 @@ import com.harvey.gamespc.utils.DownloadStatus
 
 @OptIn(UnstableApi::class)
 @Composable
-fun DetailScreen(detailViewModel: DetailViewModel) {
+fun DetailScreen(
+    detailViewModel: DetailViewModel,
+    onPipModeChanged: (Boolean) -> Unit = {}
+) {
     val item by detailViewModel.item.collectAsState()
     val adState by detailViewModel.adState.collectAsState()
     val fileSizes by detailViewModel.fileSizes.collectAsState()
     val activeDownloadUrl by detailViewModel.activeDownloadUrl.collectAsState()
-    val downloadStates by detailViewModel.sharedViewModel.downloadStates.collectAsState()
+    val downloadStates by detailViewModel.downloadStates.collectAsState()
     val context = LocalContext.current
     val activity = context as? Activity
 
@@ -99,7 +102,7 @@ fun DetailScreen(detailViewModel: DetailViewModel) {
             if (!currentItem.videoUrl.isNullOrBlank()) {
                 VideoPlayer(
                     videoUrl = currentItem.videoUrl!!,
-                    sharedViewModel = detailViewModel.sharedViewModel,
+                    onPipModeChanged = onPipModeChanged,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
@@ -210,7 +213,7 @@ fun DetailScreen(detailViewModel: DetailViewModel) {
                                 }
                                 if (inAppDownloadStatus is DownloadStatus.Progress) {
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Button(onClick = { detailViewModel.sharedViewModel.cancelDownload(downloadLink) }) {
+                                    Button(onClick = { detailViewModel.cancelDownload(downloadLink) }) {
                                         Text("Cancel")
                                     }
                                 }

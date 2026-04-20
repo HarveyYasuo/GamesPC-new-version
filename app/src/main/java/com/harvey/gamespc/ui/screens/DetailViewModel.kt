@@ -1,20 +1,23 @@
 package com.harvey.gamespc.ui.screens
 
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import androidx.core.net.toUri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.harvey.gamespc.SharedViewModel
 import com.harvey.gamespc.ads.AdManager
 import com.harvey.gamespc.data.GameItem
+import com.harvey.gamespc.data.repository.GameRepository
 import com.harvey.gamespc.utils.AdBlockerDetector
-import com.harvey.gamespc.utils.FileSizeFetcher
+import com.harvey.gamespc.utils.AppDownloadManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 sealed class AdState {
     object Idle : AdState()
@@ -24,11 +27,16 @@ sealed class AdState {
     object AdBlockerDetected : AdState()
 }
 
-class DetailViewModel(
-    private val itemId: String,
-    private val categoryName: String,
-    val sharedViewModel: SharedViewModel
+@HiltViewModel
+class DetailViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
+    private val repository: GameRepository,
+    private val application: Application,
+    private val downloadManager: AppDownloadManager
 ) : ViewModel() {
+
+    private val itemId: String = checkNotNull(savedStateHandle["itemId"])
+    private val categoryName: String = checkNotNull(savedStateHandle["categoryName"])
 
     private val _item = MutableStateFlow<GameItem?>(null)
     val item: StateFlow<GameItem?> = _item
@@ -44,23 +52,36 @@ class DetailViewModel(
 
     private val _userEarnedReward = MutableStateFlow(false)
 
+    val downloadStates = downloadManager.downloadStates
+
     init {
         loadItem()
-        // loadAd() // REMOVED: No longer loading ad automatically
     }
 
     private fun loadItem() {
         viewModelScope.launch {
-            sharedViewModel.items.collect { items ->
-                val category = items.find { it.name.equals(categoryName, ignoreCase = true) }
-                val foundItem = category?.data?.find { it.id == itemId }
-                _item.value = foundItem
-                foundItem?.let {
-                    val sizes = it.downloadUrl?.split(",")?.associate { url ->
-                        val trimmedUrl = url.trim()
-                        trimmedUrl to (FileSizeFetcher.getFileSize(trimmedUrl) ?: "N/A")
-                    } ?: emptyMap()
-                    _fileSizes.value = sizes
+            repository.getAllGames().collect { result ->
+                result.onSuccess { tables ->
+                    val category = tables.find { it.name.equals(categoryName, ignoreCase = true) }
+                    val foundItem = category?.data?.find { it.id == itemId }
+                    _item.value = foundItem
+                    
+                    foundItem?.let { item ->
+                        // Actualizar tamaños de archivos si no están presentes
+                        if (item.fileSize == null) {
+                            val urls = item.downloadUrl?.split(",")?.map { it.trim() } ?: emptyList()
+                            val sizes = mutableMapOf<String, String>()
+                            urls.forEach { url ->
+                                val size = repository.fetchItemFileSize(url) ?: "N/A"
+                                sizes[url] = size
+                            }
+                            _fileSizes.value = sizes
+                        } else {
+                            // Si ya tiene tamaño (por el SharedViewModel o similar), lo usamos
+                            val url = item.downloadUrl?.split(",")?.get(0)?.trim() ?: ""
+                            _fileSizes.value = mapOf(url to (item.fileSize ?: "N/A"))
+                        }
+                    }
                 }
             }
         }
@@ -68,17 +89,17 @@ class DetailViewModel(
 
     fun loadAdForDownload(url: String) {
         viewModelScope.launch {
-            if (AdBlockerDetector.isAdBlockerActive(sharedViewModel.getApplication())) {
+            if (AdBlockerDetector.isAdBlockerActive(application)) {
                 _adState.value = AdState.AdBlockerDetected
             } else {
                 _activeDownloadUrl.value = url
                 _adState.value = AdState.Loading
                 AdManager.loadRewardedAd(
-                    sharedViewModel.getApplication(),
+                    application,
                     onAdLoaded = { _adState.value = AdState.Ready },
                     onAdFailedToLoad = {
                         _adState.value = AdState.Error(it)
-                        _activeDownloadUrl.value = null // Reset on failure
+                        _activeDownloadUrl.value = null
                     }
                 )
             }
@@ -86,49 +107,39 @@ class DetailViewModel(
     }
 
     fun showAd(activity: Activity) {
-        val downloadUrl = _activeDownloadUrl.value ?: return // Don't show if no URL is active
-
-        // Reset reward state before showing a new ad
+        val downloadUrl = _activeDownloadUrl.value ?: return
         _userEarnedReward.value = false
 
         AdManager.showRewardedAd(
             activity,
-            onUserEarnedReward = {
-                // Mark that the user has earned the reward
-                _userEarnedReward.value = true
-            },
+            onUserEarnedReward = { _userEarnedReward.value = true },
             onAdDismissed = {
-                // Check if the user earned the reward before starting the download
                 if (_userEarnedReward.value) {
                     startDownload(downloadUrl, activity)
                 }
-                // Reset states after the ad is dismissed
                 _adState.value = AdState.Idle
                 _activeDownloadUrl.value = null
-                _userEarnedReward.value = false // Reset for the next ad cycle
+                _userEarnedReward.value = false
             },
             onAdFailedToShow = {
                 _adState.value = AdState.Error("Ad failed to show.")
-                _activeDownloadUrl.value = null // Reset on failure
-                _userEarnedReward.value = false // Reset on failure
+                _activeDownloadUrl.value = null
+                _userEarnedReward.value = false
             }
         )
     }
 
     fun showAdForInAppDownload(activity: Activity, url: String) {
         val downloadUrl = _activeDownloadUrl.value ?: return
-
         _userEarnedReward.value = false
 
         AdManager.showRewardedAd(
             activity,
-            onUserEarnedReward = {
-                _userEarnedReward.value = true
-            },
+            onUserEarnedReward = { _userEarnedReward.value = true },
             onAdDismissed = {
                 if (_userEarnedReward.value) {
                     val fileName = item.value?.title ?: "downloaded_file"
-                    sharedViewModel.startInAppDownload(downloadUrl, fileName)
+                    downloadManager.startInAppDownload(downloadUrl, fileName)
                 }
                 _adState.value = AdState.Idle
                 _activeDownloadUrl.value = null
@@ -140,6 +151,10 @@ class DetailViewModel(
                 _userEarnedReward.value = false
             }
         )
+    }
+
+    fun cancelDownload(url: String) {
+        downloadManager.cancelDownload(url)
     }
 
     fun startDownload(url: String, context: Context) {
@@ -150,19 +165,5 @@ class DetailViewModel(
     override fun onCleared() {
         super.onCleared()
         AdManager.releaseAd()
-    }
-
-    class Factory(
-        private val itemId: String,
-        private val categoryName: String,
-        private val sharedViewModel: SharedViewModel
-    ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(DetailViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return DetailViewModel(itemId, categoryName, sharedViewModel) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
     }
 }

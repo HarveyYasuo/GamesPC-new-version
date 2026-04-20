@@ -10,12 +10,11 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-import com.harvey.gamespc.SharedViewModel
 
 @Composable
 fun VideoPlayer(
     videoUrl: String,
-    sharedViewModel: SharedViewModel,
+    onPipModeChanged: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -32,7 +31,7 @@ fun VideoPlayer(
     val playerListener = remember {
         object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
-                sharedViewModel.setPipMode(isPlaying)
+                onPipModeChanged(isPlaying)
             }
         }
     }
@@ -42,7 +41,7 @@ fun VideoPlayer(
         onDispose {
             exoPlayer.removeListener(playerListener)
             exoPlayer.release()
-            sharedViewModel.setPipMode(false)
+            onPipModeChanged(false)
         }
     }
 
