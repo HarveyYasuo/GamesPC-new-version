@@ -17,9 +17,10 @@ import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 import kotlinx.coroutines.tasks.await
 
-class SharedViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val database = FirebaseDatabase.getInstance().reference
+class SharedViewModel(
+    application: Application,
+    private val repository: FirebaseGameRepository = FirebaseGameRepository()
+) : AndroidViewModel(application) {
 
     private val _items = MutableStateFlow<List<GameTable>>(emptyList())
     val items: StateFlow<List<GameTable>> = _items
@@ -49,48 +50,55 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             _loading.value = true
             _error.value = null
-            try {
-                val snapshot = database.child("Base").get().await()
-                val fetchedItems = snapshot.children.mapNotNull { childSnapshot ->
-                    val type = childSnapshot.child("type").getValue(String::class.java)
-                    if (type == "table" || type == "database") {
-                        childSnapshot.getValue(GameTable::class.java)
-                    } else {
-                        null
+            
+            repository.getAllGames().collect { result ->
+                result.fold(
+                    onSuccess = { fetchedItems ->
+                        _items.value = fetchedItems
+                        _loading.value = false
+                        // Once we have items, we start fetching file sizes in background
+                        fetchFileSizes(fetchedItems)
+                    },
+                    onFailure = { exception ->
+                        _error.value = "Error fetching items: ${exception.message}"
+                        _items.value = emptyList()
+                        _loading.value = false
                     }
-                }
-                _items.value = fetchedItems
+                )
+            }
+        }
+    }
 
-                // Post-process to fetch file sizes individually and update state immutably
-                fetchedItems.forEach { table ->
-                    table.data?.forEach { item ->
-                        item.downloadUrl?.let { url ->
-                            viewModelScope.launch {
-                                val fileSize = FileSizeFetcher.getFileSize(url)
-                                // Create a new state by updating the specific item immutably
-                                _items.value = _items.value.map { currentTable ->
-                                    if (currentTable.name == table.name) { // Find the right table
-                                        val updatedData = currentTable.data?.map { currentItem ->
-                                            if (currentItem.id == item.id) { // Find the right item
-                                                currentItem.copy(fileSize = fileSize) // Create a new item with the file size
-                                            } else {
-                                                currentItem
-                                            }
-                                        }
-                                        currentTable.copy(data = updatedData) // Create a new table with the updated item list
-                                    } else {
-                                        currentTable
-                                    }
-                                }
-                            }
+    private fun fetchFileSizes(tables: List<GameTable>) {
+        tables.forEach { table ->
+            table.data?.forEach { item ->
+                item.downloadUrl?.let { url ->
+                    if (item.fileSize == null) { // Only fetch if not already present
+                        viewModelScope.launch {
+                            val fileSize = repository.fetchItemFileSize(url)
+                            updateItemFileSize(table.name, item.id, fileSize)
                         }
                     }
                 }
-            } catch (e: Exception) {
-                _error.value = "Error fetching items from Firebase: ${e.message}"
-                _items.value = emptyList()
-            } finally {
-                _loading.value = false
+            }
+        }
+    }
+
+    private fun updateItemFileSize(tableName: String?, itemId: String?, fileSize: String?) {
+        if (tableName == null || itemId == null || fileSize == null) return
+        
+        _items.value = _items.value.map { currentTable ->
+            if (currentTable.name == tableName) {
+                val updatedData = currentTable.data?.map { currentItem ->
+                    if (currentItem.id == itemId) {
+                        currentItem.copy(fileSize = fileSize)
+                    } else {
+                        currentItem
+                    }
+                }
+                currentTable.copy(data = updatedData)
+            } else {
+                currentTable
             }
         }
     }
