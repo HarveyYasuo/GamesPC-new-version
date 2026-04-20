@@ -1,0 +1,29 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Dark Theme -->
+    <style name="Theme.GamesPC" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/dark_primary</item>
+        <item name="colorPrimaryVariant">@color/dark_primary_dark</item>
+        <item name="colorOnPrimary">@color/dark_text_primary</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/dark_cyan_neon</item>
+        <item name="colorSecondaryVariant">@color/dark_cyan_neon</item>
+        <item name="colorOnSecondary">@color/dark_background</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+
+        <!-- Standard Attributes -->
+        <item name="android:windowBackground">@color/dark_background</item>
+        <item name="colorSurface">@color/dark_background</item>
+        <item name="colorOnSurface">@color/dark_text_primary</item>
+        <item name="android:textColor">@color/dark_text_primary</item>
+    </style>
+
+    <style name="ShapeAppearance.App.CornerSize16dpTop" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+</resources>

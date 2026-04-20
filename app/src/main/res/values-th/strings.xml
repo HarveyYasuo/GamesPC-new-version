@@ -1,0 +1,61 @@
+<resources>
+    <string name="app_name">เกมส์พีซี</string>
+    <string name="title_home">หน้าแรก</string>
+    <string name="title_dashboard">แดชบอร์ด</string>
+    <string name="title_programs">โปรแกรม</string>
+    <string name="title_notifications">การแจ้งเตือน</string>
+    <string name="content_description_back">ย้อนกลับ</string>
+    <string name="content_description_close_search">ปิดการค้นหา</string>
+    <string name="content_description_search">ค้นหา</string>
+    <string name="title_details">รายละเอียด</string>
+    <string name="downloads_title">ดาวน์โหลด:</string>
+    <string name="download_from_prefix">ดูโฆษณาเพื่อดาวน์โหลดจาก</string>
+    <string name="service_name_mediafire">มีเดียไฟร์</string>
+    <string name="service_name_1fichier">1ไฟล์เชียร์</string>
+    <string name="service_name_gofile">โกไฟล์</string>
+    <string name="service_name_direct_link">ลิงก์ตรง</string>
+    <string name="chat_input_placeholder">พิมพ์ที่นี่...</string>
+    <string name="chat_send_button">ส่ง</string>
+    <string name="title_gist">สรุป</string>
+    <string name="title_settings">การตั้งค่า</string>
+
+    <string name="menu_search">ค้นหา</string>
+    <string name="action_share">แชร์</string>
+    <string name="action_remove_ads">ลบโฆษณา</string>
+    <string name="menu_send_feedback">ส่งความคิดเห็น</string>
+
+    <string name="notification_inactivity_title">เราคิดถึงคุณ!</string>
+    <string name="notification_inactivity_message">กลับมาเล่นและค้นพบสิ่งใหม่ๆ ใน %1$s</string>
+    <string name="notification_channel_name">กิจกรรมเกม</string>
+    <string name="notification_channel_description">การแจ้งเตือนเกี่ยวกับกิจกรรมและเกมที่แนะนำ</string>
+
+    <string name="loading_ad">กำลังโหลดโฆษณา...</string>
+    <string name="loading_text">กำลังโหลด...</string>
+
+    <string name="error_loading_data">เกิดข้อผิดพลาดในการโหลดข้อมูล: %s</string>
+
+    <string name="update_dialog_title">การอัปเดตที่จำเป็น</string>
+    <string name="update_dialog_message">มีแอปพลิเคชันเวอร์ชันใหม่ให้ใช้งาน โปรดอัปเดตเพื่อใช้งานแอปต่อไป</string>
+    <string name="update_button">อัปเดต</string>
+
+    <string name="share_app_message">สวัสดี! ถ้าคุณชอบแอปนี้ โปรดแชร์กับเพื่อนของคุณ การสนับสนุนของคุณเป็นแรงบันดาลใจให้ฉันปรับปรุงและเพิ่มเนื้อหาต่อไป ขอบคุณ!</string>
+    <string name="share_button_text">แชร์แอป</string>
+    <string name="share_app_subject">ลองดู GamesPC สิ!</string>
+    <string name="share_app_text">ดาวน์โหลด GamesPC เพื่อค้นหาและสนุกกับเกมโปรดของคุณ! https://play.google.com/store/apps/details?id=com.harvey.gamespc</string>
+
+    <string name="share_dialog_title">แชร์แอป!</string>
+    <string name="share_dialog_message">หากคุณชอบแอปของเรา โปรดช่วยให้เราเติบโตด้วยการแชร์กับเพื่อนและครอบครัวของคุณ!</string>
+    <string name="share_dialog_button_share">แชร์เลย</string>
+    <string name="share_dialog_button_later">ไว้ทีหลัง</string>
+
+    <!-- Ad Blocker Detection -->
+    <string name="ad_blocker_detected_title">ตรวจพบบล็อกเกอร์โฆษณา</string>
+    <string name="ad_blocker_detected_message">เพื่อเข้าถึงเนื้อหานี้ โปรดปิดการใช้งานบล็อกเกอร์โฆษณาของคุณและรีสตาร์ทแอปพลิเคชัน</string>
+
+    <!-- Ad Flow Strings -->
+    <string name="ad_loading">กำลังโหลดโฆษณา...</string>
+    <string name="ad_ready_to_show">แสดงโฆษณาเพื่อดาวน์โหลด</string>
+    <string name="ad_error_retry">โฆษณาผิดพลาด ลองอีกครั้ง</string>
+    <string name="ad_blocker_detected">ตรวจพบตัวบล็อกโฆษณา</string>
+    <string name="download_button_text">ดาวน์โหลด</string>
+</resources>

@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1028354208272",
+    "firebase_url": "https://gamesogpc-default-rtdb.firebaseio.com",
+    "project_id": "gamesogpc",
+    "storage_bucket": "gamesogpc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1028354208272:android:0588ef06bda9c3ed5a5095",
+        "android_client_info": {
+          "package_name": "com.harvey.gamespc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBb_hUcwv7rOUzpKN6Z6y9BKxKzqP3qx30"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

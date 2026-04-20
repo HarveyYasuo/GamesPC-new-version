@@ -1,0 +1,78 @@
+<resources>
+    <string name="app_name">GamesPC</string>
+    <string name="title_home">Inicio</string>
+    <string name="title_dashboard">Dashboard</string> <!-- Updated -->
+    <string name="title_programs">Programas</string>
+    <string name="title_notifications">Notificaciones</string> <!-- Updated -->
+    <string name="title_chat" translatable="false">Chat</string> <!-- Added -->
+    <string name="default_web_client_id" translatable="false">TU_WEB_CLIENT_ID_AQUI</string>
+
+    <string-array name="item_categories">
+        <item>Juegos</item>
+        <item>Emuladores</item>
+        <item>Celulares</item>
+        <item>Extras</item>
+        <item>Programas</item>
+        <item>Comunidad</item>
+        <item>GanaPlus</item>
+    </string-array>
+
+    <string name="content_description_back">Atrás</string>
+    <string name="content_description_close_search">Cerrar búsqueda</string>
+    <string name="content_description_search">Buscar</string>
+    <string name="title_details">Detalles</string>
+    <string name="downloads_title">Descargas:</string>
+    <string name="download_from_prefix">Ver anuncio para descargar desde</string>
+    <string name="service_name_mediafire">Mediafire</string>
+    <string name="service_name_1fichier">1Fichier</string>
+    <string name="service_name_gofile">Gofile</string>
+    <string name="service_name_direct_link">Enlace Directo</string>
+    <string name="chat_input_placeholder">Escribe un mensaje...</string>
+    <string name="chat_send_button">Enviar</string>
+    <string name="title_gist">Gist</string>
+    <string name="title_settings">Ajustes</string>
+
+    <string name="menu_search">Buscar</string>
+    <string name="action_share">Compartir</string>
+    <string name="action_remove_ads">Quitar Anuncios</string>
+    <string name="menu_send_feedback">Enviar Comentarios</string>
+
+    <!-- Strings for Inactivity Notifications -->
+    <string name="notification_inactivity_title">¡Te extrañamos!</string>
+    <string name="notification_inactivity_message">Vuelve a jugar y descubre las novedades de %1$s.</string>
+    <string name="notification_channel_name">Eventos de Juegos</string>
+    <string name="notification_channel_description">Notificaciones sobre eventos y juegos recomendados.</string>
+
+    <string name="loading_ad">Cargando anuncio...</string>
+    <string name="loading_text">Cargando...</string>
+
+    <string name="error_loading_data">Error al cargar los datos: %s</string>
+
+    <!-- Strings for Update Dialog -->
+    <string name="update_dialog_title">Actualización Obligatoria</string>
+    <string name="update_dialog_message">Hay una nueva versión disponible de la aplicación. Por favor, actualiza para continuar usando la app.</string>
+    <string name="update_button">Actualizar</string>
+
+    <!-- Share App Message -->
+    <string name="share_app_message">¡Hola! Si te gusta la aplicación, por favor compártela con tus amigos. Tu apoyo me motiva a seguir mejorándola y añadiendo más contenido. ¡Gracias!</string>
+    <string name="share_button_text">Compartir App</string>
+    <string name="share_app_subject">Echa un vistazo a GamesPC!</string>
+    <string name="share_app_text">¡Descarga GamesPC para encontrar y disfrutar de tus juegos favoritos! https://play.google.com/store/apps/details?id=com.harvey.gamespc</string>
+
+    <!-- Share App Dialog Specific Texts -->
+    <string name="share_dialog_title">¡Comparte la App!</string>
+    <string name="share_dialog_message">Si te gusta nuestra aplicación, ¡ayúdanos a crecer compartiéndola con tus amigos y familiares!</string>
+    <string name="share_dialog_button_share">Compartir Ahora</string>
+    <string name="share_dialog_button_later">Quizás más tarde</string>
+
+    <!-- Ad Blocker Detection -->
+    <string name="ad_blocker_detected_title">Bloqueador de anuncios detectado</string>
+    <string name="ad_blocker_detected_message">Para acceder a este contenido, por favor deshabilita tu bloqueador de anuncios y reinicia la aplicación.</string>
+
+    <!-- Ad Flow Strings -->
+    <string name="ad_loading">Cargando anuncio...</string>
+    <string name="ad_ready_to_show">Mostrar Anuncio para Descargar</string>
+    <string name="ad_error_retry">Error de anuncio. Reintentar.</string>
+    <string name="ad_blocker_detected">Bloqueador de anuncios detectado</string>
+    <string name="download_button_text" translatable="false">Descargar</string>
+</resources>

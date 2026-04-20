@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Light Theme Colors -->
+    <color name="light_background">#FFFFFF</color>
+    <color name="light_primary">#F0F0F0</color> <!-- Light gray for primary, e.g., toolbar/bottom nav background -->
+    <color name="light_primary_dark">#CCCCCC</color> <!-- Slightly darker gray -->
+    <color name="light_accent">#2196F3</color> <!-- A vibrant blue for accent -->
+    <color name="light_text_primary">#000000</color>
+    <color name="light_text_secondary">#8A000000</color> <!-- 54% black -->
+
+
+    <!-- Dark Theme Cyber-Neon Palette (Original) -->
+    <color name="dark_background">#1A1A2E</color>
+    <color name="dark_cyan_neon">#00FFFF</color>
+    <color name="dark_magenta_neon">#FF00FF</color>
+    <color name="dark_text_primary">#FFFFFF</color>
+    <color name="dark_text_secondary">#E0E0E0</color>
+
+    <!-- Placeholder declarations for dark theme colors to satisfy Lint -->
+    <color name="dark_primary">#000000</color>
+    <color name="dark_primary_dark">#000000</color>
+    <color name="dark_accent">#000000</color>
+    <color name="shimmer_placeholder">#E0E0E0</color>
+
+</resources>

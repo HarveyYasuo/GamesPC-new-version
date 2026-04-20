@@ -1,0 +1,89 @@
+package com.harvey.gamespc
+
+import android.app.Application
+import android.content.Context
+import android.util.Log
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import coil3.SingletonImageLoader
+import coil3.disk.DiskCache
+import coil3.memory.MemoryCache
+import com.google.android.gms.ads.MobileAds
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.harvey.gamespc.notifications.NotificationWorker
+import com.harvey.gamespc.utils.PresenceManager
+import java.util.concurrent.TimeUnit
+import okio.Path.Companion.toOkioPath
+
+class MyApplication : Application(), SingletonImageLoader.Factory, LifecycleEventObserver {
+
+    companion object {
+        lateinit var analytics: FirebaseAnalytics
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+
+        // Initialize Firebase Analytics
+        analytics = FirebaseAnalytics.getInstance(this)
+
+        // Initialize Google Mobile Ads SDK
+        MobileAds.initialize(this) { initializationStatus ->
+            Log.d("MyApplication", "Mobile Ads SDK initialized with status: $initializationStatus")
+        }
+
+        // Global AdMob Policy Compliance: Ensure ads are family-friendly and COPPA compliant
+        // This is necessary to reach the "widest possible audience" (General Audience/Families)
+        val requestConfiguration = MobileAds.getRequestConfiguration().toBuilder()
+            .setTagForChildDirectedTreatment(com.google.android.gms.ads.RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE)
+            .setMaxAdContentRating(com.google.android.gms.ads.RequestConfiguration.MAX_AD_CONTENT_RATING_G)
+            .build()
+        MobileAds.setRequestConfiguration(requestConfiguration)
+
+    }
+
+    override fun newImageLoader(context: Context): coil3.ImageLoader {
+        return coil3.ImageLoader.Builder(context)
+            .memoryCache {
+                MemoryCache.Builder()
+                    .maxSizePercent(context, 0.25) // Use 25% of the app's available memory for the memory cache.
+                    .build()
+            }
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(context.cacheDir.resolve("image_cache").toOkioPath())
+                    .maxSizeBytes(512L * 1024 * 1024) // 512MB
+                    .build()
+            }
+            .build()
+    }
+
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        when (event) {
+            Lifecycle.Event.ON_START -> {
+                PresenceManager.goOnline(applicationContext)
+                // Cancel any pending inactivity notifications
+                WorkManager.getInstance(applicationContext).cancelUniqueWork("inactivity_notification_work")
+            }
+            Lifecycle.Event.ON_STOP -> {
+                PresenceManager.goOffline(applicationContext)
+                // Schedule an inactivity notification after 30 minutes
+                val inactivityRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
+                    .setInitialDelay(30, TimeUnit.MINUTES)
+                    .build()
+                WorkManager.getInstance(applicationContext).enqueueUniqueWork(
+                    "inactivity_notification_work",
+                    ExistingWorkPolicy.REPLACE,
+                    inactivityRequest
+                )
+            }
+            else -> {}
+        }
+    }
+}

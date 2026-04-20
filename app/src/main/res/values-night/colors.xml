@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Theme Cyber-Neon Palette -->
+    <color name="dark_background">#1A1A2E</color>
+    <color name="dark_primary">@color/dark_background</color>
+    <color name="dark_primary_dark">@color/dark_background</color>
+    <color name="dark_accent">#00FFFF</color>
+    <color name="dark_cyan_neon">#00FFFF</color>
+    <color name="dark_magenta_neon">#FF00FF</color>
+    <color name="dark_text_primary">#FFFFFF</color>
+    <color name="dark_text_secondary">#E0E0E0</color>
+
+</resources>
