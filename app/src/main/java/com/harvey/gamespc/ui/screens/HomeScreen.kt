@@ -3,31 +3,36 @@ package com.harvey.gamespc.ui.screens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.harvey.gamespc.SharedViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.harvey.gamespc.ui.home.HomeUiState
+import com.harvey.gamespc.ui.home.HomeViewModel
 
 @Composable
 fun HomeScreen(
-    sharedViewModel: SharedViewModel, 
     searchQuery: String, 
-    onItemClick: (itemId: String, categoryName: String) -> Unit
+    onItemClick: (itemId: String, categoryName: String) -> Unit,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val gistTables by sharedViewModel.items.collectAsState()
-    val isLoading by sharedViewModel.loading.collectAsState()
-    val searchResults by sharedViewModel.searchResults.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
-    val itemsToDisplay = if (searchQuery.isNotBlank()) {
-        searchResults
-            .filter { it.name.equals("Juegos", ignoreCase = true) }
-            .flatMap { it.data.orEmpty() }
-    } else {
-        gistTables
-            .filter { it.name.equals("Juegos", ignoreCase = true) }
-            .flatMap { it.data.orEmpty() }
+    when (val state = uiState) {
+        is HomeUiState.Loading -> {
+            ItemsGridScreen(
+                items = emptyList(),
+                isLoading = true,
+                onItemClick = {}
+            )
+        }
+        is HomeUiState.Success -> {
+            val itemsToDisplay = viewModel.searchGames(searchQuery, state)
+            ItemsGridScreen(
+                items = itemsToDisplay,
+                isLoading = false,
+                onItemClick = { onItemClick(it.id ?: "", "Juegos") }
+            )
+        }
+        is HomeUiState.Error -> {
+            // Podrías mostrar un mensaje de error aquí
+        }
     }
-
-    ItemsGridScreen(
-        items = itemsToDisplay,
-        isLoading = isLoading,
-        onItemClick = { onItemClick(it.id ?: "", "Juegos") }
-    )
 }

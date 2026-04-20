@@ -29,7 +29,6 @@ fun NavigationGraph(
     NavHost(navController, startDestination = TopBarNavItem.Home.route) {
         composable(TopBarNavItem.Home.route) {
             HomeScreen(
-                sharedViewModel = sharedViewModel,
                 searchQuery = searchQuery,
                 onItemClick = onItemClick
             )
