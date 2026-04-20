@@ -1,17 +1,20 @@
 package com.harvey.gamespc.utils
 
-import android.content.Context
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object PresenceManager {
-
-    private val database = FirebaseDatabase.getInstance()
-    private val presenceRef = database.getReference("presence")
+@Singleton
+class PresenceManager @Inject constructor(
+    private val databaseReference: DatabaseReference,
+    private val anonymousIdManager: AnonymousIdManager
+) {
+    private val presenceRef = databaseReference.child("presence")
 
     private val _activeUsersCount = MutableStateFlow(0)
     val activeUsersCount = _activeUsersCount.asStateFlow()
@@ -31,15 +34,15 @@ object PresenceManager {
         presenceRef.addValueEventListener(presenceListener)
     }
 
-    fun goOnline(context: Context) {
-        val uniqueId = AnonymousIdManager.getUniqueId(context)
+    fun goOnline() {
+        val uniqueId = anonymousIdManager.getAnonymousId()
         val userStatusRef = presenceRef.child(uniqueId)
         userStatusRef.setValue(true)
         userStatusRef.onDisconnect().removeValue()
     }
 
-    fun goOffline(context: Context) {
-        val uniqueId = AnonymousIdManager.getUniqueId(context)
+    fun goOffline() {
+        val uniqueId = anonymousIdManager.getAnonymousId()
         presenceRef.child(uniqueId).removeValue()
     }
 }

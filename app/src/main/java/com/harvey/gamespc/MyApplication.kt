@@ -19,10 +19,14 @@ import com.harvey.gamespc.notifications.NotificationWorker
 import com.harvey.gamespc.utils.PresenceManager
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import okio.Path.Companion.toOkioPath
 
 @HiltAndroidApp
 class MyApplication : Application(), SingletonImageLoader.Factory, LifecycleEventObserver {
+
+    @Inject
+    lateinit var presenceManager: PresenceManager
 
     companion object {
         lateinit var analytics: FirebaseAnalytics
@@ -69,12 +73,12 @@ class MyApplication : Application(), SingletonImageLoader.Factory, LifecycleEven
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             Lifecycle.Event.ON_START -> {
-                PresenceManager.goOnline(applicationContext)
+                presenceManager.goOnline()
                 // Cancel any pending inactivity notifications
                 WorkManager.getInstance(applicationContext).cancelUniqueWork("inactivity_notification_work")
             }
             Lifecycle.Event.ON_STOP -> {
-                PresenceManager.goOffline(applicationContext)
+                presenceManager.goOffline()
                 // Schedule an inactivity notification after 30 minutes
                 val inactivityRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
                     .setInitialDelay(30, TimeUnit.MINUTES)
