@@ -1,5 +1,7 @@
 package com.harvey.gamespc.ui.screens
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,6 +29,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import com.harvey.gamespc.R
+import androidx.compose.animation.animateContentSize
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +47,6 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
         }
     }
 
-    // Notificar cuando el usuario está escribiendo
     LaunchedEffect(messageText) {
         chatViewModel.onTyping(messageText.isNotBlank())
     }
@@ -52,35 +54,21 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFF8FAFC),
-                        Color(0xFFEBF8FF)
-                    )
-                )
-            )
+            .background(Brush.verticalGradient(colors = listOf(Color(0xFFF8FAFC), Color(0xFFEBF8FF))))
     ) {
-        // Messages
         LazyColumn(
             state = listState,
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp), // Espacio menor para mensajes agrupados
+            modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
-            itemsIndexed(messages) { index, message ->
+            itemsIndexed(messages, key = { _, m -> m.id }) { index, message ->
                 val prevMessage = if (index > 0) messages[index - 1] else null
                 val nextMessage = if (index < messages.size - 1) messages[index + 1] else null
                 
-                // Lógica de fecha
                 val showDateHeader = shouldShowDateHeader(prevMessage, message)
-                if (showDateHeader) {
-                    DateHeader(timestamp = message.timestamp)
-                }
+                if (showDateHeader) DateHeader(timestamp = message.timestamp)
 
-                // Lógica de agrupación
                 val isSameUserAsPrev = prevMessage?.userId == message.userId && !showDateHeader
                 val isSameUserAsNext = nextMessage?.userId == message.userId
                 
@@ -93,15 +81,11 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
                     isLastInGroup = !isSameUserAsNext
                 )
                 
-                // Espacio extra si cambia de usuario
-                if (!isSameUserAsNext) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
+                if (!isSameUserAsNext) Spacer(modifier = Modifier.height(8.dp))
             }
         }
 
-        // Typing Indicator
-        if (typingUsers.isNotEmpty()) {
+        AnimatedVisibility(visible = typingUsers.isNotEmpty()) {
             val typingText = when {
                 typingUsers.size == 1 -> "${typingUsers[0]} está escribiendo..."
                 typingUsers.size == 2 -> "${typingUsers[0]} y ${typingUsers[1]} están escribiendo..."
@@ -116,67 +100,26 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
             )
         }
 
-        // Input
-        Surface(
-            color = Color.White,
-            tonalElevation = 8.dp,
-            shadowElevation = 16.dp,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 12.dp)
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .imePadding(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = { /* Handle emoji */ },
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(
-                        Icons.Default.EmojiEmotions,
-                        contentDescription = "Emoji",
-                        tint = Color(0xFF6B7280)
-                    )
+        Surface(color = Color.White, tonalElevation = 8.dp, shadowElevation = 16.dp, modifier = Modifier.fillMaxWidth()) {
+            Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp).fillMaxWidth().navigationBarsPadding().imePadding(), verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = { /* Handle emoji */ }, modifier = Modifier.size(40.dp)) {
+                    Icon(Icons.Default.EmojiEmotions, contentDescription = "Emoji", tint = Color(0xFF6B7280))
                 }
 
-                Surface(
-                    modifier = Modifier.weight(1f),
-                    color = Color(0xFFF3F4F6),
-                    shape = RoundedCornerShape(24.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                Surface(modifier = Modifier.weight(1f), color = Color(0xFFF3F4F6), shape = RoundedCornerShape(24.dp)) {
+                    Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                         BasicTextField(
                             value = messageText,
                             onValueChange = { messageText = it },
                             modifier = Modifier.weight(1f),
                             textStyle = LocalTextStyle.current.copy(fontSize = 16.sp),
-                            decorationBox = { innerTextField ->
-                                if (messageText.isEmpty()) {
-                                    Text(
-                                        stringResource(R.string.chat_input_placeholder),
-                                        color = Color(0xFF9CA3AF),
-                                        fontSize = 16.sp
-                                    )
-                                }
-                                innerTextField()
+                            decorationBox = { inner ->
+                                if (messageText.isEmpty()) Text(stringResource(R.string.chat_input_placeholder), color = Color(0xFF9CA3AF), fontSize = 16.sp)
+                                inner()
                             }
                         )
-                        
-                        IconButton(
-                            onClick = { /* Handle attachment */ },
-                            modifier = Modifier.size(32.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Attachment,
-                                contentDescription = "Adjuntar",
-                                tint = Color(0xFF6B7280)
-                            )
+                        IconButton(onClick = { /* Handle attachment */ }, modifier = Modifier.size(32.dp)) {
+                            Icon(Icons.Default.Attachment, contentDescription = "Adjuntar", tint = Color(0xFF6B7280))
                         }
                     }
                 }
@@ -184,55 +127,27 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
                 Spacer(modifier = Modifier.width(8.dp))
 
                 FloatingActionButton(
-                    onClick = {
-                        if (messageText.isNotBlank()) {
-                            chatViewModel.sendMessage(messageText)
-                            messageText = ""
-                        }
-                    },
-                    modifier = Modifier.size(48.dp),
-                    shape = CircleShape,
-                    containerColor = if (messageText.isBlank()) Color(0xFFE5E7EB) else Color(0xFF3B82F6),
-                    elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp)
+                    onClick = { if (messageText.isNotBlank()) { chatViewModel.sendMessage(messageText); messageText = "" } },
+                    modifier = Modifier.size(48.dp), shape = CircleShape,
+                    containerColor = if (messageText.isBlank()) Color(0xFFE5E7EB) else Color(0xFF3B82F6)
                 ) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.Send,
-                        contentDescription = stringResource(R.string.chat_send_button),
-                        tint = if (messageText.isBlank()) Color(0xFF9CA3AF) else Color.White
-                    )
+                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.chat_send_button), tint = if (messageText.isBlank()) Color(0xFF9CA3AF) else Color.White)
                 }
             }
         }
     }
 }
 
-// Necesitamos importar BasicTextField y LocalTextStyle
-
 @Composable
 fun DateHeader(timestamp: Long) {
     val dateText = getFormattedDate(timestamp)
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Surface(
-            color = Color(0xFFE2E8F0),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Text(
-                text = dateText,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF64748B)
-            )
+    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
+        Surface(color = Color(0xFFE2E8F0), shape = RoundedCornerShape(12.dp)) {
+            Text(text = dateText, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF64748B))
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageItem(
     message: Message, 
@@ -243,12 +158,9 @@ fun MessageItem(
     isLastInGroup: Boolean = true
 ) {
     val isCurrentUser = message.userId == currentUserId
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start
-    ) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start) {
         Surface(
-            modifier = Modifier.widthIn(max = 280.dp),
+            modifier = Modifier.widthIn(max = 280.dp).animateContentSize(tween(300)),
             shape = RoundedCornerShape(
                 topStart = if (!isCurrentUser && !isFirstInGroup) 4.dp else 20.dp,
                 topEnd = if (isCurrentUser && !isFirstInGroup) 4.dp else 20.dp,
@@ -261,40 +173,20 @@ fun MessageItem(
             Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
                 if (showName) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = message.senderName,
-                            color = if (isCurrentUser) Color.White.copy(alpha = 0.7f) else Color(0xFF3B82F6),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text(text = message.senderName, color = if (isCurrentUser) Color.White.copy(alpha = 0.7f) else Color(0xFF3B82F6), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         if (isOnline && !isCurrentUser) {
                             Spacer(modifier = Modifier.width(4.dp))
                             Box(modifier = Modifier.size(6.dp).background(Color(0xFF10B981), CircleShape))
                         }
                     }
-                    Spacer(modifier = Modifier.height(2.dp))
                 }
+                Text(text = message.text, color = if (isCurrentUser) Color.White else Color(0xFF1F2937), fontSize = 15.sp)
                 
-                Text(
-                    text = message.text,
-                    color = if (isCurrentUser) Color.White else Color(0xFF1F2937),
-                    fontSize = 15.sp,
-                    lineHeight = 20.sp
-                )
-                
-                Row(
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text(
-                        text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(message.timestamp)),
-                        fontSize = 10.sp,
-                        color = if (isCurrentUser) Color.White.copy(alpha = 0.7f) else Color(0xFF9CA3AF)
-                    )
+                Row(horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.align(Alignment.End)) {
+                    Text(text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(message.timestamp)), fontSize = 10.sp, color = if (isCurrentUser) Color.White.copy(alpha = 0.7f) else Color(0xFF9CA3AF))
                     if (isCurrentUser) {
                         Spacer(modifier = Modifier.width(4.dp))
-                        MessageStatusIndicator(status = message.status)
+                        AnimatedContent(targetState = message.status, label = "status") { status -> MessageStatusIndicator(status) }
                     }
                 }
             }
@@ -305,32 +197,20 @@ fun MessageItem(
 @Composable
 fun MessageStatusIndicator(status: MessageStatus) {
     val color = if (status == MessageStatus.READ) Color(0xFF10B981) else Color.White.copy(alpha = 0.6f)
-    val icon = if (status == MessageStatus.READ || status == MessageStatus.DELIVERED) {
-        Icons.Default.DoneAll
-    } else {
-        Icons.Default.Done
-    }
-
-    Icon(
-        imageVector = icon,
-        contentDescription = status.name,
-        modifier = Modifier.size(14.dp),
-        tint = color
-    )
+    val icon = if (status == MessageStatus.READ || status == MessageStatus.DELIVERED) Icons.Default.DoneAll else Icons.Default.Done
+    Icon(imageVector = icon, contentDescription = status.name, modifier = Modifier.size(14.dp), tint = color)
 }
 
 private fun shouldShowDateHeader(prev: Message?, current: Message): Boolean {
     if (prev == null) return true
     val cal1 = Calendar.getInstance().apply { timeInMillis = prev.timestamp }
     val cal2 = Calendar.getInstance().apply { timeInMillis = current.timestamp }
-    return cal1.get(Calendar.DAY_OF_YEAR) != cal2.get(Calendar.DAY_OF_YEAR) ||
-           cal1.get(Calendar.YEAR) != cal2.get(Calendar.YEAR)
+    return cal1.get(Calendar.DAY_OF_YEAR) != cal2.get(Calendar.DAY_OF_YEAR) || cal1.get(Calendar.YEAR) != cal2.get(Calendar.YEAR)
 }
 
 private fun getFormattedDate(timestamp: Long): String {
     val now = Calendar.getInstance()
     val msgDate = Calendar.getInstance().apply { timeInMillis = timestamp }
-    
     return when {
         isSameDay(now, msgDate) -> "Hoy"
         isYesterday(now, msgDate) -> "Ayer"
@@ -338,10 +218,7 @@ private fun getFormattedDate(timestamp: Long): String {
     }
 }
 
-private fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
-    return cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR) &&
-           cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
-}
+private fun isSameDay(cal1: Calendar, cal2: Calendar) = cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR) && cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
 
 private fun isYesterday(now: Calendar, msgDate: Calendar): Boolean {
     val yesterday = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
