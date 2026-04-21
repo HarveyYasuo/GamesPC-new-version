@@ -117,48 +117,22 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
 
         // Input
         Surface(
-            color = Color.White.copy(alpha = 0.95f),
+            color = Color.White,
+            tonalElevation = 8.dp,
+            shadowElevation = 16.dp,
             modifier = Modifier.fillMaxWidth()
         ) {
             Row(
                 modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.Bottom
+                    .padding(horizontal = 8.dp, vertical = 12.dp)
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .imePadding(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    onClick = { /* Handle attachment */ }
-                ) {
-                    Icon(
-                        Icons.Default.Attachment,
-                        contentDescription = "Adjuntar",
-                        tint = Color(0xFF6B7280)
-                    )
-                }
-
-                OutlinedTextField(
-                    value = messageText,
-                    onValueChange = { messageText = it },
-                    modifier = Modifier.weight(1f),
-                    placeholder = {
-                        Text(
-                            stringResource(R.string.chat_input_placeholder),
-                            color = Color(0xFF9CA3AF)
-                        )
-                    },
-                    shape = RoundedCornerShape(24.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF3B82F6),
-                        unfocusedBorderColor = Color(0xFFE5E7EB),
-                        focusedContainerColor = Color(0xFFF9FAFB),
-                        unfocusedContainerColor = Color(0xFFF9FAFB)
-                    )
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                IconButton(
-                    onClick = { /* Handle emoji */ }
+                    onClick = { /* Handle emoji */ },
+                    modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
                         Icons.Default.EmojiEmotions,
@@ -166,6 +140,47 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
                         tint = Color(0xFF6B7280)
                     )
                 }
+
+                Surface(
+                    modifier = Modifier.weight(1f),
+                    color = Color(0xFFF3F4F6),
+                    shape = RoundedCornerShape(24.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        BasicTextField(
+                            value = messageText,
+                            onValueChange = { messageText = it },
+                            modifier = Modifier.weight(1f),
+                            textStyle = LocalTextStyle.current.copy(fontSize = 16.sp),
+                            decorationBox = { innerTextField ->
+                                if (messageText.isEmpty()) {
+                                    Text(
+                                        stringResource(R.string.chat_input_placeholder),
+                                        color = Color(0xFF9CA3AF),
+                                        fontSize = 16.sp
+                                    )
+                                }
+                                innerTextField()
+                            }
+                        )
+                        
+                        IconButton(
+                            onClick = { /* Handle attachment */ },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Attachment,
+                                contentDescription = "Adjuntar",
+                                tint = Color(0xFF6B7280)
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
 
                 FloatingActionButton(
                     onClick = {
@@ -175,26 +190,22 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
                         }
                     },
                     modifier = Modifier.size(48.dp),
-                    containerColor = if (messageText.isBlank()) {
-                        Color(0xFFE5E7EB)
-                    } else {
-                        Color(0xFF3B82F6)
-                    }
+                    shape = CircleShape,
+                    containerColor = if (messageText.isBlank()) Color(0xFFE5E7EB) else Color(0xFF3B82F6),
+                    elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp)
                 ) {
                     Icon(
                         Icons.AutoMirrored.Filled.Send,
                         contentDescription = stringResource(R.string.chat_send_button),
-                        tint = if (messageText.isBlank()) {
-                            Color(0xFF9CA3AF)
-                        } else {
-                            Color.White
-                        }
+                        tint = if (messageText.isBlank()) Color(0xFF9CA3AF) else Color.White
                     )
                 }
             }
         }
     }
 }
+
+// Necesitamos importar BasicTextField y LocalTextStyle
 
 @Composable
 fun DateHeader(timestamp: Long) {
