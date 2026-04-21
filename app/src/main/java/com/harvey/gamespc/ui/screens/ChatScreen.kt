@@ -32,6 +32,7 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
     var messageText by remember { mutableStateOf("") }
     val messages by chatViewModel.messages.collectAsState()
     val typingUsers by chatViewModel.typingUsers.collectAsState()
+    val onlineUsers by chatViewModel.onlineUsers.collectAsState()
     val currentUserId = chatViewModel.currentUserId
     val listState = rememberLazyListState()
 
@@ -68,7 +69,11 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
             items(messages) { message ->
-                MessageItem(message = message, currentUserId = currentUserId)
+                MessageItem(
+                    message = message, 
+                    currentUserId = currentUserId,
+                    isOnline = onlineUsers.contains(message.userId)
+                )
             }
         }
 
@@ -171,7 +176,7 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MessageItem(message: Message, currentUserId: String) {
+fun MessageItem(message: Message, currentUserId: String, isOnline: Boolean = false) {
     val isCurrentUser = message.userId == currentUserId
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -199,16 +204,26 @@ fun MessageItem(message: Message, currentUserId: String) {
             Column(
                 modifier = Modifier.padding(12.dp)
             ) {
-                Text(
-                    text = message.senderName,
-                    color = if (isCurrentUser) {
-                        Color.White.copy(alpha = 0.7f)
-                    } else {
-                        Color(0xFF1F2937).copy(alpha = 0.7f)
-                    },
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = message.senderName,
+                        color = if (isCurrentUser) {
+                            Color.White.copy(alpha = 0.7f)
+                        } else {
+                            Color(0xFF1F2937).copy(alpha = 0.7f)
+                        },
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    if (isOnline) {
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(6.dp)
+                                .background(Color(0xFF10B981), CircleShape)
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = message.text,
