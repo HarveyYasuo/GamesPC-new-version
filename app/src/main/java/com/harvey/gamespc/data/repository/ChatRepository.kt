@@ -17,6 +17,7 @@ class ChatRepository @Inject constructor(
     private val databaseReference: DatabaseReference
 ) {
     private val chatRef = databaseReference.child("chat")
+    private val typingRef = databaseReference.child("typing")
 
     fun getMessages(): Flow<List<Message>> = callbackFlow {
         val listener = object : ValueEventListener {
@@ -24,7 +25,9 @@ class ChatRepository @Inject constructor(
                 val messageList = mutableListOf<Message>()
                 for (messageSnapshot in snapshot.children) {
                     val message = messageSnapshot.getValue(Message::class.java)
-                    message?.let { messageList.add(it) }
+                    message?.let { 
+                        messageList.add(it.copy(id = messageSnapshot.key ?: "")) 
+                    }
                 }
                 trySend(messageList.sortedBy { it.timestamp })
             }
@@ -35,6 +38,40 @@ class ChatRepository @Inject constructor(
         }
         chatRef.addValueEventListener(listener)
         awaitClose { chatRef.removeEventListener(listener) }
+    }
+
+    fun markMessageAsRead(messageId: String) {
+        if (messageId.isNotEmpty()) {
+            chatRef.child(messageId).child("status").setValue(MessageStatus.READ)
+        }
+    }
+
+    fun setTypingStatus(userId: String, userName: String, isTyping: Boolean) {
+        if (isTyping) {
+            typingRef.child(userId).setValue(userName)
+        } else {
+            typingRef.child(userId).removeValue()
+        }
+    }
+
+    fun getTypingUsers(currentUserId: String): Flow<List<String>> = callbackFlow {
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val typingUsers = mutableListOf<String>()
+                for (child in snapshot.children) {
+                    val userId = child.key
+                    val userName = child.getValue(String::class.java)
+                    if (userId != currentUserId && userName != null) {
+                        typingUsers.add(userName)
+                    }
+                }
+                trySend(typingUsers)
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+        }
+        typingRef.addValueEventListener(listener)
+        awaitClose { typingRef.removeEventListener(listener) }
     }
 
     fun sendMessage(message: Message) {
