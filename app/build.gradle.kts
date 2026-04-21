@@ -14,12 +14,12 @@ plugins {
 
 android {
     namespace = "com.harvey.gamespc"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.harvey.gamespc"
         minSdk = 23
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 56
         versionName = "1.1.1"
 
@@ -59,9 +59,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_21
     }
     kotlinOptions.jvmTarget = "21" // Set directly on kotlinOptions
-    composeOptions {
-        kotlinCompilerExtensionVersion = "2.0.21"
-    }
+
     buildFeatures {
         viewBinding = false // Cambia esto a false ya que usarás Compose
         buildConfig = true

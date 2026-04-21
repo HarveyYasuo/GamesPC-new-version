@@ -2,19 +2,19 @@ INFORMACIÓN DEL PROYECTO
 
 Configuración Base:
 
-Proyecto: \[GamesPC]
+Proyecto: [GamesPC]
 
-Package: \[com.harvey.gamespc]
+Package: [com.harvey.gamespc]
 
-Kotlin Version: \[2.2.0]
+Kotlin Version: [2.1.10]
 
-Java Version: \[21]
+Java Version: [21]
 
-Gradle Version: \[gradle-8.13]
+Gradle Version: [gradle-8.12.1]
 
-Target SDK: \[36]
+Target SDK: [35]
 
-Min SDK: \[23]
+Min SDK: [23]
 
 
 
