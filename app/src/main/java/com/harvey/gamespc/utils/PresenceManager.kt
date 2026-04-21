@@ -19,15 +19,22 @@ class PresenceManager @Inject constructor(
     private val _activeUsersCount = MutableStateFlow(0)
     val activeUsersCount = _activeUsersCount.asStateFlow()
 
+    private val _onlineUsers = MutableStateFlow<Set<String>>(emptySet())
+    val onlineUsers = _onlineUsers.asStateFlow()
+
     private val presenceListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
             val count = snapshot.childrenCount.toInt()
             _activeUsersCount.value = count
+            
+            val users = mutableSetOf<String>()
+            for (child in snapshot.children) {
+                child.key?.let { users.add(it) }
+            }
+            _onlineUsers.value = users
         }
 
-        override fun onCancelled(error: DatabaseError) {
-            // Handle error
-        }
+        override fun onCancelled(error: DatabaseError) {}
     }
 
     init {
@@ -37,7 +44,7 @@ class PresenceManager @Inject constructor(
     fun goOnline() {
         val uniqueId = anonymousIdManager.getAnonymousId()
         val userStatusRef = presenceRef.child(uniqueId)
-        userStatusRef.setValue(true)
+        userStatusRef.setValue(System.currentTimeMillis()) // Guardamos el timestamp de conexión
         userStatusRef.onDisconnect().removeValue()
     }
 
