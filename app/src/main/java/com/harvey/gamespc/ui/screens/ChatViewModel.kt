@@ -23,11 +23,11 @@ data class Message(
     val timestamp: Long = 0L,
     val status: MessageStatus = MessageStatus.SENT
 )
-
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val repository: ChatRepository,
-    private val anonymousIdManager: AnonymousIdManager
+    private val anonymousIdManager: AnonymousIdManager,
+    private val presenceManager: com.harvey.gamespc.utils.PresenceManager
 ) : ViewModel() {
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages: StateFlow<List<Message>> = _messages.asStateFlow()
@@ -35,10 +35,15 @@ class ChatViewModel @Inject constructor(
     private val _typingUsers = MutableStateFlow<List<String>>(emptyList())
     val typingUsers: StateFlow<List<String>> = _typingUsers.asStateFlow()
 
+    val onlineUsers = presenceManager.onlineUsers
+
     val currentUserId: String = anonymousIdManager.getAnonymousId()
     private val anonymousName = "Anon-" + currentUserId.substring(0, 5)
 
     init {
+        // Notificar que estamos online
+        presenceManager.goOnline()
+
         viewModelScope.launch {
             repository.getMessages().collect { list ->
                 _messages.value = list
