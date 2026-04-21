@@ -24,16 +24,11 @@ INSTRUCCIONES CRÍTICAS PARA GEMINI
 
 &nbsp;EVITAR BUCLES Y ERRORES COMUNES
 
-
-
 NUNCA generes código que ya existe en el proyecto
-
+SIEMPRE realiza un commit git por cada cambio realizado, por mínimo que sea
 SIEMPRE pregunta por el contexto específico antes de generar código
-
 NO asumas la estructura del proyecto sin verificar
-
 EVITA respuestas genéricas, sé específico al contexto actual
-
 CONFIRMA la versión de dependencias antes de sugerir código
 
 

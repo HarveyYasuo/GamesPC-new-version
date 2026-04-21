@@ -16,6 +16,7 @@ enum class MessageStatus {
 }
 
 data class Message(
+    val id: String = "",
     val userId: String = "",
     val senderName: String = "",
     val text: String = "",
@@ -35,15 +36,27 @@ class ChatViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repository.getMessages().collect {
-                _messages.value = it
+            repository.getMessages().collect { list ->
+                _messages.value = list
+                // Marcar como leídos los mensajes que NO son del usuario actual y que aún no están en READ
+                list.filter { it.userId != currentUserId && it.status != MessageStatus.READ }
+                    .forEach { message ->
+                        repository.markMessageAsRead(message.id)
+                    }
             }
         }
     }
 
     fun sendMessage(text: String) {
         val anonymousName = "Anon-" + currentUserId.substring(0, 5)
-        val newMessage = Message(currentUserId, anonymousName, text, System.currentTimeMillis(), MessageStatus.SENT)
+        val newMessage = Message(
+            id = "", // Firebase generará el ID
+            userId = currentUserId,
+            senderName = anonymousName,
+            text = text,
+            timestamp = System.currentTimeMillis(),
+            status = MessageStatus.SENT
+        )
         repository.sendMessage(newMessage)
     }
 }

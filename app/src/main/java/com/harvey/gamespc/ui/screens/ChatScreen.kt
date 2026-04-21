@@ -228,33 +228,17 @@ fun MessageItem(message: Message, currentUserId: String) {
 
 @Composable
 fun MessageStatusIndicator(status: MessageStatus) {
-    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-        Box(
-            modifier = Modifier
-                .size(8.dp)
-                .background(
-                    when (status) {
-                        MessageStatus.SENT -> Color.White.copy(alpha = 0.6f)
-                        MessageStatus.DELIVERED -> Color.White.copy(alpha = 0.6f)
-                        MessageStatus.READ -> Color(0xFF10B981)
-                    },
-                    CircleShape
-                )
-        )
-        
-        if (status != MessageStatus.SENT) {
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .background(
-                        when (status) {
-                            MessageStatus.DELIVERED -> Color.White.copy(alpha = 0.6f)
-                            MessageStatus.READ -> Color(0xFF10B981)
-                            else -> Color.Transparent
-                        },
-                        CircleShape
-                    )
-            )
-        }
+    val color = if (status == MessageStatus.READ) Color(0xFF10B981) else Color.White.copy(alpha = 0.6f)
+    val icon = if (status == MessageStatus.READ || status == MessageStatus.DELIVERED) {
+        Icons.Default.DoneAll
+    } else {
+        Icons.Default.Done
     }
+
+    Icon(
+        imageVector = icon,
+        contentDescription = status.name,
+        modifier = Modifier.size(16.dp),
+        tint = color
+    )
 }
