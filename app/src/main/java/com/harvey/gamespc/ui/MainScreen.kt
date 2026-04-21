@@ -231,6 +231,9 @@ fun TopBar(
                     }) {
                         Icon(painter = painterResource(id = R.drawable.ic_compartido), contentDescription = "Share App", tint = Color.Unspecified)
                     }
+                    IconButton(onClick = { navController.navigate("settings") }) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings", tint = MaterialTheme.colorScheme.onSurface)
+                    }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
