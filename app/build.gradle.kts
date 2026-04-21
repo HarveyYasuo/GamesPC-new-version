@@ -20,8 +20,8 @@ android {
         applicationId = "com.harvey.gamespc"
         minSdk = 23
         targetSdk = 35
-        versionCode = 56
-        versionName = "1.1.1"
+        versionCode = 57
+        versionName = "1.1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -41,8 +41,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            isShrinkResources = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
