@@ -31,6 +31,7 @@ import com.harvey.gamespc.R
 fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
     var messageText by remember { mutableStateOf("") }
     val messages by chatViewModel.messages.collectAsState()
+    val typingUsers by chatViewModel.typingUsers.collectAsState()
     val currentUserId = chatViewModel.currentUserId
     val listState = rememberLazyListState()
 
@@ -38,6 +39,11 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.size - 1)
         }
+    }
+
+    // Notificar cuando el usuario está escribiendo
+    LaunchedEffect(messageText) {
+        chatViewModel.onTyping(messageText.isNotBlank())
     }
 
     Column(
@@ -64,6 +70,22 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
             items(messages) { message ->
                 MessageItem(message = message, currentUserId = currentUserId)
             }
+        }
+
+        // Typing Indicator
+        if (typingUsers.isNotEmpty()) {
+            val typingText = when {
+                typingUsers.size == 1 -> "${typingUsers[0]} está escribiendo..."
+                typingUsers.size == 2 -> "${typingUsers[0]} y ${typingUsers[1]} están escribiendo..."
+                else -> "${typingUsers[0]} y ${typingUsers.size - 1} más están escribiendo..."
+            }
+            Text(
+                text = typingText,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
+                fontSize = 12.sp,
+                color = Color(0xFF3B82F6),
+                fontWeight = FontWeight.Medium
+            )
         }
 
         // Input
