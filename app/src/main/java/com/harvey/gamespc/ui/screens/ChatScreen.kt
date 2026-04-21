@@ -3,7 +3,7 @@ package com.harvey.gamespc.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import com.harvey.gamespc.R
@@ -65,15 +66,36 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp), // Espacio menor para mensajes agrupados
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
-            items(messages) { message ->
+            itemsIndexed(messages) { index, message ->
+                val prevMessage = if (index > 0) messages[index - 1] else null
+                val nextMessage = if (index < messages.size - 1) messages[index + 1] else null
+                
+                // Lógica de fecha
+                val showDateHeader = shouldShowDateHeader(prevMessage, message)
+                if (showDateHeader) {
+                    DateHeader(timestamp = message.timestamp)
+                }
+
+                // Lógica de agrupación
+                val isSameUserAsPrev = prevMessage?.userId == message.userId && !showDateHeader
+                val isSameUserAsNext = nextMessage?.userId == message.userId
+                
                 MessageItem(
                     message = message, 
                     currentUserId = currentUserId,
-                    isOnline = onlineUsers.contains(message.userId)
+                    isOnline = onlineUsers.contains(message.userId),
+                    showName = !isSameUserAsPrev,
+                    isFirstInGroup = !isSameUserAsPrev,
+                    isLastInGroup = !isSameUserAsNext
                 )
+                
+                // Espacio extra si cambia de usuario
+                if (!isSameUserAsNext) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
         }
 
@@ -174,85 +196,90 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
     }
 }
 
+@Composable
+fun DateHeader(timestamp: Long) {
+    val dateText = getFormattedDate(timestamp)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
+            color = Color(0xFFE2E8F0),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text(
+                text = dateText,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF64748B)
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MessageItem(message: Message, currentUserId: String, isOnline: Boolean = false) {
+fun MessageItem(
+    message: Message, 
+    currentUserId: String, 
+    isOnline: Boolean = false,
+    showName: Boolean = true,
+    isFirstInGroup: Boolean = true,
+    isLastInGroup: Boolean = true
+) {
     val isCurrentUser = message.userId == currentUserId
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = if (isCurrentUser) {
-            Arrangement.End
-        } else {
-            Arrangement.Start
-        }
+        horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start
     ) {
         Surface(
             modifier = Modifier.widthIn(max = 280.dp),
             shape = RoundedCornerShape(
-                topStart = 20.dp,
-                topEnd = 20.dp,
-                bottomStart = if (isCurrentUser) 20.dp else 8.dp,
-                bottomEnd = if (isCurrentUser) 8.dp else 20.dp
+                topStart = if (!isCurrentUser && !isFirstInGroup) 4.dp else 20.dp,
+                topEnd = if (isCurrentUser && !isFirstInGroup) 4.dp else 20.dp,
+                bottomStart = if (!isCurrentUser && !isLastInGroup) 4.dp else 20.dp,
+                bottomEnd = if (isCurrentUser && !isLastInGroup) 4.dp else 20.dp
             ),
-            color = if (isCurrentUser) {
-                Color(0xFF3B82F6)
-            } else {
-                Color.White
-            },
-            shadowElevation = 2.dp
+            color = if (isCurrentUser) Color(0xFF3B82F6) else Color.White,
+            shadowElevation = if (isFirstInGroup) 1.dp else 0.5.dp
         ) {
-            Column(
-                modifier = Modifier.padding(12.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = message.senderName,
-                        color = if (isCurrentUser) {
-                            Color.White.copy(alpha = 0.7f)
-                        } else {
-                            Color(0xFF1F2937).copy(alpha = 0.7f)
-                        },
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    if (isOnline) {
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Box(
-                            modifier = Modifier
-                                .size(6.dp)
-                                .background(Color(0xFF10B981), CircleShape)
+            Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+                if (showName) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = message.senderName,
+                            color = if (isCurrentUser) Color.White.copy(alpha = 0.7f) else Color(0xFF3B82F6),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
                         )
+                        if (isOnline && !isCurrentUser) {
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Box(modifier = Modifier.size(6.dp).background(Color(0xFF10B981), CircleShape))
+                        }
                     }
+                    Spacer(modifier = Modifier.height(2.dp))
                 }
-                Spacer(modifier = Modifier.height(4.dp))
+                
                 Text(
                     text = message.text,
-                    color = if (isCurrentUser) {
-                        Color.White
-                    } else {
-                        Color(0xFF1F2937)
-                    },
-                    fontSize = 14.sp,
+                    color = if (isCurrentUser) Color.White else Color(0xFF1F2937),
+                    fontSize = 15.sp,
                     lineHeight = 20.sp
                 )
-                
-                Spacer(modifier = Modifier.height(4.dp))
                 
                 Row(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.align(Alignment.End)
                 ) {
                     Text(
                         text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(message.timestamp)),
-                        fontSize = 11.sp,
-                        color = if (isCurrentUser) {
-                            Color.White.copy(alpha = 0.7f) 
-                        } else {
-                            Color(0xFF9CA3AF)
-                        }
+                        fontSize = 10.sp,
+                        color = if (isCurrentUser) Color.White.copy(alpha = 0.7f) else Color(0xFF9CA3AF)
                     )
-                    
                     if (isCurrentUser) {
                         Spacer(modifier = Modifier.width(4.dp))
                         MessageStatusIndicator(status = message.status)
@@ -275,7 +302,36 @@ fun MessageStatusIndicator(status: MessageStatus) {
     Icon(
         imageVector = icon,
         contentDescription = status.name,
-        modifier = Modifier.size(16.dp),
+        modifier = Modifier.size(14.dp),
         tint = color
     )
+}
+
+private fun shouldShowDateHeader(prev: Message?, current: Message): Boolean {
+    if (prev == null) return true
+    val cal1 = Calendar.getInstance().apply { timeInMillis = prev.timestamp }
+    val cal2 = Calendar.getInstance().apply { timeInMillis = current.timestamp }
+    return cal1.get(Calendar.DAY_OF_YEAR) != cal2.get(Calendar.DAY_OF_YEAR) ||
+           cal1.get(Calendar.YEAR) != cal2.get(Calendar.YEAR)
+}
+
+private fun getFormattedDate(timestamp: Long): String {
+    val now = Calendar.getInstance()
+    val msgDate = Calendar.getInstance().apply { timeInMillis = timestamp }
+    
+    return when {
+        isSameDay(now, msgDate) -> "Hoy"
+        isYesterday(now, msgDate) -> "Ayer"
+        else -> SimpleDateFormat("d 'de' MMMM", Locale("es", "ES")).format(Date(timestamp))
+    }
+}
+
+private fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
+    return cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR) &&
+           cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
+}
+
+private fun isYesterday(now: Calendar, msgDate: Calendar): Boolean {
+    val yesterday = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
+    return isSameDay(yesterday, msgDate)
 }
