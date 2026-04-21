@@ -32,7 +32,11 @@ class ChatViewModel @Inject constructor(
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages: StateFlow<List<Message>> = _messages.asStateFlow()
 
+    private val _typingUsers = MutableStateFlow<List<String>>(emptyList())
+    val typingUsers: StateFlow<List<String>> = _typingUsers.asStateFlow()
+
     val currentUserId: String = anonymousIdManager.getAnonymousId()
+    private val anonymousName = "Anon-" + currentUserId.substring(0, 5)
 
     init {
         viewModelScope.launch {
@@ -45,10 +49,19 @@ class ChatViewModel @Inject constructor(
                     }
             }
         }
+
+        viewModelScope.launch {
+            repository.getTypingUsers(currentUserId).collect {
+                _typingUsers.value = it
+            }
+        }
+    }
+
+    fun onTyping(isTyping: Boolean) {
+        repository.setTypingStatus(currentUserId, anonymousName, isTyping)
     }
 
     fun sendMessage(text: String) {
-        val anonymousName = "Anon-" + currentUserId.substring(0, 5)
         val newMessage = Message(
             id = "", // Firebase generará el ID
             userId = currentUserId,
@@ -58,5 +71,13 @@ class ChatViewModel @Inject constructor(
             status = MessageStatus.SENT
         )
         repository.sendMessage(newMessage)
+        // Dejar de escribir al enviar
+        onTyping(false)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // Asegurarse de limpiar el estado de escritura al salir
+        onTyping(false)
     }
 }
