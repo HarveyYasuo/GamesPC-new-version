@@ -18,6 +18,7 @@ import com.harvey.gamespc.ui.screens.ChatScreen
 import com.harvey.gamespc.ui.screens.DetailScreen
 import com.harvey.gamespc.ui.screens.DetailViewModel
 import com.harvey.gamespc.ui.screens.HomeScreen
+import com.harvey.gamespc.ui.screens.SettingsScreen
 
 @Composable
 fun NavigationGraph(
@@ -35,6 +36,9 @@ fun NavigationGraph(
         }
         composable(TopBarNavItem.Chat.route) {
             ChatScreen()
+        }
+        composable("settings") {
+            SettingsScreen()
         }
         composable("search") {
             // Placeholder for Search Screen
