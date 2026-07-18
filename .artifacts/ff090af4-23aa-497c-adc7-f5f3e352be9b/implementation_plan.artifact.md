@@ -1,30 +1,24 @@
-# Implement Unity Ads Mediation
+# Update AGP to Fix R8/Kotlin Metadata Warning
 
-The goal is to properly configure Unity Ads mediation within the existing AdMob setup. Since the dependencies are already present in `build.gradle.kts`, we will focus on the programmatic configuration for privacy compliance (GDPR, CCPA) and ensuring the mediation adapter is correctly utilized.
+The project is showing a warning because R8 (bundled with AGP 8.8.2) does not fully support Kotlin 2.3.0 metadata. Upgrading to AGP 8.13.2 will provide a newer R8 version that supports Kotlin 2.3.0.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **AdMob Dashboard Configuration**: Programmatic changes alone are not enough. You must configure Unity Ads as a mediation source in your AdMob dashboard (Game ID and Placement ID are required there).
+> **Git Push**: I can perform local `git commit` operations as per your instructions. However, I do not have access to your GitHub credentials to perform a `git push`. You will need to manually push the changes to GitHub.
 
 ## Proposed Changes
 
-### Ad Logic and Privacy Compliance
+### Build Configuration
 
-#### [MODIFY] [MainActivity.kt](file:///C:/Users/Harvey/StudioProjects/GamesPC-new-version/app/src/main/java/com/harvey/gamespc/MainActivity.kt)
-- Update `setUnityAdsConsent()` to include CCPA (`privacy.consent`) and COPPA (`user.nonbehavioral`) metadata.
-- Ensure `MobileAds.initialize` is called after the consent state is determined.
-
-### Build Configuration (Verification)
-
-#### [MODIFY] [build.gradle.kts](file:///C:/Users/Harvey/StudioProjects/GamesPC-new-version/app/build.gradle.kts)
-- Verify Unity Ads and Mediation Adapter versions are compatible with the current AdMob SDK version.
+#### [MODIFY] [libs.versions.toml](file:///C:/Users/Harvey/StudioProjects/GamesPC-new-version/gradle/libs.versions.toml)
+- Update `agp` version from `8.8.2` to `8.13.2`.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run the app and check Logcat for Unity Ads initialization logs (the adapter usually logs its status).
-- Use AdMob's "Ad Inspector" to verify that Unity Ads is listed as a mediation partner and can serve ads.
+- Run Gradle Sync to ensure the new AGP version is applied correctly.
+- Build the project using `gradlew assembleDebug` to verify the warning is gone and the build is successful.
 
 ### Manual Verification
-- Verify that the consent flow correctly propagates to Unity Ads metadata.
+- Verify in Logcat/Build Output that the "An error occurred when parsing kotlin metadata" warning no longer appears.
