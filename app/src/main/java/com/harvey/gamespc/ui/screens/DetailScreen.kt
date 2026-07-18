@@ -170,7 +170,7 @@ fun DetailScreen(
                                     if (isCurrentLinkReady) {
                                         detailViewModel.showAd(activity)
                                     } else {
-                                        detailViewModel.loadAdForDownload(downloadLink)
+                                        detailViewModel.loadAdForDownload(downloadLink, activity)
                                     }
                                 }
                             },
@@ -196,7 +196,7 @@ fun DetailScreen(
                                             if (isCurrentLinkReady) {
                                                 detailViewModel.showAdForInAppDownload(activity, downloadLink)
                                             } else {
-                                                detailViewModel.loadAdForDownload(downloadLink)
+                                                detailViewModel.loadAdForDownload(downloadLink, activity)
                                             }
                                         }
                                     },

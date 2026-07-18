@@ -20,8 +20,8 @@ android {
         applicationId = "com.harvey.gamespc"
         minSdk = 23
         targetSdk = 35
-        versionCode = 57
-        versionName = "1.1.2"
+        versionCode = 59
+        versionName = "1.1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -32,7 +32,7 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("/home/harvey-rivas/DevingApps/AndroidProject19122025-20260410T203451Z-3-001/AndroidProject19122025/keyOG")
+            storeFile = file("C:/users/harvey/keyOG")
             storePassword = "q0p1w9o2e9"
             keyAlias = "keyog"
             keyPassword = "q0p1w9o2e9"
@@ -58,7 +58,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions.jvmTarget = "21" // Set directly on kotlinOptions
+
 
     buildFeatures {
         viewBinding = false // Cambia esto a false ya que usarás Compose
@@ -69,6 +69,12 @@ android {
         jniLibs {
             useLegacyPackaging = false
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
     }
 }
 
@@ -107,9 +113,9 @@ dependencies {
     // Google Play Billing
     implementation(libs.android.billing)
 
-    // estas son las dependencias de unity ads para mediación gestionada por Admob.
-    implementation("com.unity3d.ads:unity-ads:4.16.1")
-    implementation("com.google.ads.mediation:unity:4.16.1.0")
+    // Unity Ads para mediación gestionada por AdMob
+    implementation("com.unity3d.ads:unity-ads:4.19.0")
+    implementation("com.google.ads.mediation:unity:4.19.0.0")
 
     implementation(libs.androidx.work.runtime)
     implementation(libs.airbnb.lottie)
@@ -150,4 +156,6 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
+    // Force KSP to use the updated Kotlin metadata parser
+    ksp("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0")
 }

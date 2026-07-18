@@ -87,7 +87,7 @@ class DetailViewModel @Inject constructor(
         }
     }
 
-    fun loadAdForDownload(url: String) {
+    fun loadAdForDownload(url: String, context: Context) {
         viewModelScope.launch {
             if (AdBlockerDetector.isAdBlockerActive(application)) {
                 _adState.value = AdState.AdBlockerDetected
@@ -95,7 +95,7 @@ class DetailViewModel @Inject constructor(
                 _activeDownloadUrl.value = url
                 _adState.value = AdState.Loading
                 AdManager.loadRewardedAd(
-                    application,
+                    context,
                     onAdLoaded = { _adState.value = AdState.Ready },
                     onAdFailedToLoad = {
                         _adState.value = AdState.Error(it)

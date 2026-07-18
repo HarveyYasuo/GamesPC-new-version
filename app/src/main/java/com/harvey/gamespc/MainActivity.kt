@@ -28,6 +28,7 @@ import com.google.android.ump.ConsentForm
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
+import com.unity3d.ads.UnityAds
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.harvey.gamespc.ui.MainScreen
 import com.harvey.gamespc.ui.theme.GamesPCTheme
@@ -75,13 +76,15 @@ class MainActivity : ComponentActivity() {
             {
                 if (consentInformation.isConsentFormAvailable) {
                     loadConsentForm()
+                } else {
+                    setUnityAdsConsent()
                 }
             },
-            { formError ->
+            { _ ->
                 // Handle the error
+                setUnityAdsConsent() // Initialize ads even if consent check fails
             }
         )
-        MobileAds.initialize(this) {}
     }
 
     private fun loadConsentForm() {
@@ -91,14 +94,28 @@ class MainActivity : ComponentActivity() {
                 this.consentForm = form
                 if (consentInformation.consentStatus == ConsentInformation.ConsentStatus.REQUIRED) {
                     consentForm?.show(this) {
-                        // Form dismissed.
+                        setUnityAdsConsent()
                     }
+                } else {
+                    setUnityAdsConsent()
                 }
             },
             {
-                // Form loading error
+                setUnityAdsConsent()
             }
         )
+    }
+
+    private fun setUnityAdsConsent() {
+        val canRequestAds = consentInformation.canRequestAds()
+        
+        // Use the new Unity Ads Privacy API instead of deprecated MetaData
+        UnityAds.userConsent = canRequestAds
+        UnityAds.userOptOut = !canRequestAds
+        UnityAds.nonBehavioral = true
+
+        // Initialize Mobile Ads after setting Unity Ads metadata
+        MobileAds.initialize(this) {}
     }
 
     @Composable

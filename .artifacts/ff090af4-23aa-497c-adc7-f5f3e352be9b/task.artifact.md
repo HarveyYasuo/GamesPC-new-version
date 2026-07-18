@@ -1,0 +1,4 @@
+- [x] Update `MainActivity.kt` with Unity Ads privacy metadata (GDPR, CCPA, COPPA)
+- [x] Verify dependency versions in `build.gradle.kts`
+- [x] Build and verify project
+- [x] Ensure `Activity` context is used for ad loading in `DetailViewModel` and `DetailScreen`

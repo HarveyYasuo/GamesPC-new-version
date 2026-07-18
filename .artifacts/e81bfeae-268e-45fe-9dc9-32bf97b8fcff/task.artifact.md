@@ -1,0 +1,2 @@
+- [ ] Migrate `kotlinOptions.jvmTarget` to `compilerOptions` in `app/build.gradle.kts`
+- [ ] Verify build with `./gradlew :app:assembleDebug`
