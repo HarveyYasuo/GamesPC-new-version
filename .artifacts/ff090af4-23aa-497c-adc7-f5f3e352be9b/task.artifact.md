@@ -1,4 +1,4 @@
-- [x] Update `MainActivity.kt` with Unity Ads privacy metadata (GDPR, CCPA, COPPA)
-- [x] Verify dependency versions in `build.gradle.kts`
-- [x] Build and verify project
-- [x] Ensure `Activity` context is used for ad loading in `DetailViewModel` and `DetailScreen`
+- [x] Update AGP to 8.13.2 in `libs.versions.toml`
+- [x] Sync Gradle project
+- [x] Build project to verify the R8 metadata warning is gone
+- [x] Perform git commit for the AGP update
