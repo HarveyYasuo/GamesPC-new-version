@@ -108,3 +108,33 @@
 }
 -keep class com.google.firebase.database.GenericTypeIndicator
 -keep class com.google.firebase.database.GenericTypeIndicator { <init>(...); }
+
+# --- Unity Ads Mediation Rules ---
+# Essential for Unity Ads SDK and its mediation adapter
+-keep class com.unity3d.ads.** { *; }
+-keep class com.unity3d.services.** { *; }
+-keep class com.google.ads.mediation.unity.** { *; }
+
+# Keep all JNI-accessible methods
+-keepclasseswithmembers class * {
+    native <methods>;
+}
+
+# --- Hilt (Dagger) Rules for R8 Full Mode ---
+# Retain generic type information and annotations
+-keepattributes Signature, InnerClasses, EnclosingMethod, RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations, AnnotationDefault
+
+# Ensure Hilt's generated entry points are not stripped or renamed
+-keep class dagger.hilt.android.internal.managers.** { *; }
+-keep,allowobfuscation,allowshrinking @dagger.hilt.android.AndroidEntryPoint class *
+
+# Explicitly keep constructors for Hilt-injected classes and ViewModels
+-keepclassmembers class * {
+    @javax.inject.Inject <init>(...);
+}
+-keep class * extends androidx.lifecycle.ViewModel {
+    <init>(...);
+}
+
+# General optimization rules for better crash reporting
+-keepattributes SourceFile, LineNumberTable
