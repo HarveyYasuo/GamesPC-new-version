@@ -29,6 +29,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import com.harvey.gamespc.R
+import com.harvey.gamespc.utils.ChatUiState
 import androidx.compose.animation.animateContentSize
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,6 +41,12 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
     val onlineUsers by chatViewModel.onlineUsers.collectAsState()
     val currentUserId = chatViewModel.currentUserId
     val listState = rememberLazyListState()
+
+    // Mientras esta pantalla esté visible no se muestran notificaciones de chat
+    DisposableEffect(Unit) {
+        ChatUiState.chatScreenVisible = true
+        onDispose { ChatUiState.chatScreenVisible = false }
+    }
 
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
@@ -101,7 +108,7 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
         }
 
         Surface(color = Color.White, tonalElevation = 8.dp, shadowElevation = 16.dp, modifier = Modifier.fillMaxWidth()) {
-            Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp).fillMaxWidth().navigationBarsPadding().imePadding(), verticalAlignment = Alignment.CenterVertically) {
+            Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp).fillMaxWidth().imePadding(), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { /* Handle emoji */ }, modifier = Modifier.size(40.dp)) {
                     Icon(Icons.Default.EmojiEmotions, contentDescription = "Emoji", tint = Color(0xFF6B7280))
                 }

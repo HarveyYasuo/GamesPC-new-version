@@ -14,14 +14,14 @@ plugins {
 
 android {
     namespace = "com.harvey.gamespc"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.harvey.gamespc"
         minSdk = 23
-        targetSdk = 35
-        versionCode = 59
-        versionName = "1.1.4"
+        targetSdk = 36
+        versionCode = 61
+        versionName = "1.1.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -114,8 +114,8 @@ dependencies {
     implementation(libs.android.billing)
 
     // Unity Ads para mediación gestionada por AdMob
-    implementation("com.unity3d.ads:unity-ads:4.19.0")
-    implementation("com.google.ads.mediation:unity:4.19.0.0")
+    implementation("com.unity3d.ads:unity-ads:4.20.0")
+    implementation("com.google.ads.mediation:unity:4.20.0.0")
 
     implementation(libs.androidx.work.runtime)
     implementation(libs.airbnb.lottie)

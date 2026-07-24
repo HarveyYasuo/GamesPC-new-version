@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,7 +33,8 @@ fun BannerAdView(modifier: Modifier = Modifier) {
     }
 
     Box(
-        modifier = modifier.fillMaxWidth(),
+        // Evita que el banner quede debajo de la barra de navegación
+        modifier = modifier.fillMaxWidth().navigationBarsPadding(),
         contentAlignment = Alignment.Center
     ) {
         AndroidView(

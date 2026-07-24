@@ -15,6 +15,8 @@ import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
 import com.google.android.gms.ads.MobileAds
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.messaging.FirebaseMessaging
+import com.harvey.gamespc.notifications.ChatNotificationManager
 import com.harvey.gamespc.notifications.NotificationWorker
 import com.harvey.gamespc.utils.PresenceManager
 import dagger.hilt.android.HiltAndroidApp
@@ -28,6 +30,9 @@ class MyApplication : Application(), SingletonImageLoader.Factory, LifecycleEven
     @Inject
     lateinit var presenceManager: PresenceManager
 
+    @Inject
+    lateinit var chatNotificationManager: ChatNotificationManager
+
     companion object {
         lateinit var analytics: FirebaseAnalytics
     }
@@ -38,6 +43,22 @@ class MyApplication : Application(), SingletonImageLoader.Factory, LifecycleEven
 
         // Initialize Firebase Analytics
         analytics = FirebaseAnalytics.getInstance(this)
+
+        // PLAN B: notificaciones locales del chat general escuchando
+        // Realtime Database (sin Cloud Functions). Funciona mientras el
+        // proceso de la app esté vivo; NO con la app cerrada del todo.
+        chatNotificationManager.start()
+
+        // Suscribirse al tema FCM del chat general para recibir notificaciones
+        // cuando alguien envía un mensaje (lo envía la Cloud Function).
+        FirebaseMessaging.getInstance().subscribeToTopic("general_chat")
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("MyApplication", "Suscrito al tema general_chat")
+                } else {
+                    Log.w("MyApplication", "Fallo al suscribirse a general_chat: ${task.exception?.message}")
+                }
+            }
 
         // Initialize Google Mobile Ads SDK
         MobileAds.initialize(this) { initializationStatus ->

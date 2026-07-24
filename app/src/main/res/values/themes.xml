@@ -9,9 +9,7 @@
         <item name="colorSecondary">@color/light_accent</item>
         <item name="colorSecondaryVariant">@color/light_accent</item>
         <item name="colorOnSecondary">@color/light_text_primary</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        
+
         <!-- Standard Attributes -->
         <item name="android:windowBackground">@color/light_background</item>
         <item name="colorSurface">@color/light_background</item>
