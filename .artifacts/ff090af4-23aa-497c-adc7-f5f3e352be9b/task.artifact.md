@@ -1,7 +1,4 @@
-- [x] Update AGP to 8.13.2 in `libs.versions.toml`
+- [x] Update Billing Library version in `libs.versions.toml`
 - [x] Sync Gradle project
-- [x] Build project to verify the R8 metadata warning is gone
-- [x] Perform git commit for the AGP update
-- [x] Add ProGuard/R8 rules for Unity Ads and Hilt in `proguard-rules.pro`
-- [x] Build project in release mode to verify stability
-- [x] Final git commit for publication preparation
+- [x] Build project to verify stability
+- [x] Perform git commit for the version upgrade
