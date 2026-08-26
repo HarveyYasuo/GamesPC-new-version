@@ -1,0 +1,87 @@
+# Baseline Profile manual de GamesPC: clases usadas durante el arranque y la
+# navegación principal. Se puede refinar más adelante con el módulo de benchmark.
+# Clases de la app
+Lcom/harvey/gamespc/MainActivity;
+Lcom/harvey/gamespc/MyApplication;
+Lcom/harvey/gamespc/SharedViewModel;
+Lcom/harvey/gamespc/ui/MainScreen;
+Lcom/harvey/gamespc/ui/navigation/NavigationGraph;
+Lcom/harvey/gamespc/ui/screens/HomeScreen;
+Lcom/harvey/gamespc/ui/screens/ItemsGridScreen;
+Lcom/harvey/gamespc/ui/screens/DetailScreen;
+Lcom/harvey/gamespc/ui/screens/AddContentScreen;
+Lcom/harvey/gamespc/ui/screens/ChatScreen;
+Lcom/harvey/gamespc/ui/home/HomeViewModel;
+Lcom/harvey/gamespc/ui/version/VersionViewModel;
+Lcom/harvey/gamespc/ui/theme/GamesPCTheme;
+
+# Activity / ciclo de vida
+Landroidx/activity/ComponentActivity;
+Landroidx/activity/ComponentActivityKt;
+Landroidx/activity/compose/ComponentActivityKt;
+Landroidx/lifecycle/ProcessLifecycleOwner;
+Landroidx/lifecycle/LifecycleRegistry;
+
+# Compose runtime
+Landroidx/compose/runtime/ComposerImpl;
+Landroidx/compose/runtime/CompositionImpl;
+Landroidx/compose/runtime/Recomposer;
+Landroidx/compose/runtime/SnapshotStateKt;
+Landroidx/compose/runtime/LaunchedEffectKt;
+Landroidx/compose/runtime/RememberObserverKt;
+Landroidx/compose/ui/platform/AndroidComposeView;
+Landroidx/compose/ui/platform/ComposeView;
+Landroidx/compose/ui/platform/WindowRecomposerFactory;
+Landroidx/compose/ui/node/LayoutNode;
+Landroidx/compose/ui/node/LayoutNodeLayoutDelegate;
+Landroidx/compose/ui/layout/MeasurePolicy;
+Landroidx/compose/ui/draw/CanvasDrawScope;
+Landroidx/compose/ui/text/TextLayoutKt;
+Landroidx/compose/ui/text/ParagraphKt;
+Landroidx/compose/ui/graphics/drawscope/CanvasDrawScope;
+
+# Compose foundation / material3
+Landroidx/compose/foundation/lazy/LazyListKt;
+Landroidx/compose/foundation/lazy/LazyListState;
+Landroidx/compose/foundation/lazy/grid/LazyGridKt;
+Landroidx/compose/foundation/lazy/grid/LazyVerticalGridKt;
+Landroidx/compose/foundation/ImageKt;
+Landroidx/compose/material3/ScaffoldKt;
+Landroidx/compose/material3/TopAppBarKt;
+Landroidx/compose/material3/TabRowKt;
+Landroidx/compose/material3/ButtonKt;
+Landroidx/compose/material3/CardKt;
+Landroidx/compose/material3/TextKt;
+Landroidx/compose/material3/OutlinedTextFieldKt;
+Landroidx/compose/material3/SurfaceKt;
+Landroidx/compose/material3/CircularProgressIndicatorKt;
+
+# Coil (imágenes)
+Lcoil3/compose/AsyncImageKt;
+Lcoil3/ImageLoader;
+Lcoil3/SingletonImageLoader;
+Lcoil3/network/NetworkFetcher;
+Lcoil3/disk/DiskCache;
+
+# OkHttp
+Lokhttp3/OkHttpClient;
+Lokhttp3/internal/connection/RealConnection;
+Lokhttp3/internal/http1/Http1ExchangeCodec;
+Lokhttp3/internal/http2/Http2Connection;
+
+# Firebase
+Lcom/google/firebase/FirebaseApp;
+Lcom/google/firebase/database/FirebaseDatabase;
+Lcom/google/firebase/database/DatabaseReference;
+Lcom/google/firebase/database/core/Repo;
+Lcom/google/firebase/database/connection/PersistentConnectionImpl;
+Lcom/google/firebase/analytics/FirebaseAnalytics;
+
+# Coroutines
+Lkotlinx/coroutines/flow/FlowKt;
+Lkotlinx/coroutines/flow/StateFlowKt;
+Lkotlinx/coroutines/internal/DispatchedContinuation;
+Lkotlinx/coroutines/Dispatchers;
+
+# ProfileInstaller
+Landroidx/profileinstaller/ProfileInstallerInitializer;
