@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.harvey.gamespc.SharedViewModel
 import com.harvey.gamespc.ui.TopBarNavItem
+import com.harvey.gamespc.ui.screens.AddContentScreen
 import com.harvey.gamespc.ui.screens.ChatScreen
 import com.harvey.gamespc.ui.screens.DetailScreen
 import com.harvey.gamespc.ui.screens.DetailViewModel
@@ -31,11 +32,15 @@ fun NavigationGraph(
         composable(TopBarNavItem.Home.route) {
             HomeScreen(
                 searchQuery = searchQuery,
-                onItemClick = onItemClick
+                onItemClick = onItemClick,
+                sharedViewModel = sharedViewModel
             )
         }
         composable(TopBarNavItem.Chat.route) {
             ChatScreen()
+        }
+        composable(TopBarNavItem.Add.route) {
+            AddContentScreen(sharedViewModel = sharedViewModel)
         }
         composable("settings") {
             SettingsScreen()

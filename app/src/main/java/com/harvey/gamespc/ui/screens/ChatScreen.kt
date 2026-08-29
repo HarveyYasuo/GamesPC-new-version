@@ -3,8 +3,12 @@ package com.harvey.gamespc.ui.screens
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -36,6 +40,7 @@ import androidx.compose.animation.animateContentSize
 @Composable
 fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
     var messageText by remember { mutableStateOf("") }
+    var showEmojiPicker by remember { mutableStateOf(false) }
     val messages by chatViewModel.messages.collectAsState()
     val typingUsers by chatViewModel.typingUsers.collectAsState()
     val onlineUsers by chatViewModel.onlineUsers.collectAsState()
@@ -92,6 +97,30 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
             }
         }
 
+        AnimatedVisibility(visible = showEmojiPicker) {
+            Surface(
+                modifier = Modifier.fillMaxWidth().height(200.dp),
+                color = Color(0xFFF1F5F9)
+            ) {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(8),
+                    contentPadding = PaddingValues(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    items(quickEmojis) { emoji ->
+                        Text(
+                            text = emoji,
+                            fontSize = 22.sp,
+                            modifier = Modifier
+                                .clickable { messageText += emoji }
+                                .padding(4.dp)
+                        )
+                    }
+                }
+            }
+        }
+
         AnimatedVisibility(visible = typingUsers.isNotEmpty()) {
             val typingText = when {
                 typingUsers.size == 1 -> "${typingUsers[0]} está escribiendo..."
@@ -109,8 +138,8 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
 
         Surface(color = Color.White, tonalElevation = 8.dp, shadowElevation = 16.dp, modifier = Modifier.fillMaxWidth()) {
             Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp).fillMaxWidth().imePadding(), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { /* Handle emoji */ }, modifier = Modifier.size(40.dp)) {
-                    Icon(Icons.Default.EmojiEmotions, contentDescription = "Emoji", tint = Color(0xFF6B7280))
+                IconButton(onClick = { showEmojiPicker = !showEmojiPicker }, modifier = Modifier.size(40.dp)) {
+                    Icon(Icons.Default.EmojiEmotions, contentDescription = "Emoji", tint = if (showEmojiPicker) Color(0xFF3B82F6) else Color(0xFF6B7280))
                 }
 
                 Surface(modifier = Modifier.weight(1f), color = Color(0xFFF3F4F6), shape = RoundedCornerShape(24.dp)) {
@@ -125,9 +154,6 @@ fun ChatScreen(chatViewModel: ChatViewModel = hiltViewModel()) {
                                 inner()
                             }
                         )
-                        IconButton(onClick = { /* Handle attachment */ }, modifier = Modifier.size(32.dp)) {
-                            Icon(Icons.Default.Attachment, contentDescription = "Adjuntar", tint = Color(0xFF6B7280))
-                        }
                     }
                 }
 
@@ -231,3 +257,15 @@ private fun isYesterday(now: Calendar, msgDate: Calendar): Boolean {
     val yesterday = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
     return isSameDay(yesterday, msgDate)
 }
+
+// Emojis rápidos del selector del chat
+private val quickEmojis = listOf(
+    "😀", "😁", "😂", "🤣", "😊", "😍", "😘", "😎",
+    "🤩", "🥳", "😅", "😉", "🙃", "😴", "🤔", "😢",
+    "😭", "😡", "🥺", "😱", "🤯", "😇", "🤗", "🤫",
+    "👍", "👎", "👏", "🙌", "🤝", "💪", "🙏", "👋",
+    "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "💖",
+    "🔥", "✨", "⭐", "🎉", "🎮", "🕹️", "💾", "📱",
+    "🖥️", "💻", "⚽", "🏀", "🎯", "🚀", "⚡", "💯",
+    "😜", "🤙", "🫡", "🙈", "🍕", "☕", "🎵", "🆒"
+)

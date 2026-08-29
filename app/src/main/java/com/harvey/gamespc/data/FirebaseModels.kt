@@ -7,7 +7,9 @@ import com.google.firebase.database.PropertyName
 data class GameTable(
     val type: String? = null,
     val name: String? = null,
-    val data: List<GameItem>? = null
+    var data: List<GameItem>? = null,
+    // Clave del nodo en Firebase (p. ej. "1" en Base/1); no se persiste
+    var key: String? = null
 )
 
 @IgnoreExtraProperties
@@ -29,5 +31,7 @@ data class GameItem(
     var createdAt: String? = null,
     @get:PropertyName("enlace_video") @set:PropertyName("enlace_video")
     var videoUrl: String? = null,
-    var fileSize: String? = null
+    var fileSize: String? = null,
+    // Clave Firebase real del nodo (p. ej. -Nxxxx o el id numérico); no se persiste
+    var key: String? = null
 )

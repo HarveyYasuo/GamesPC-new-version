@@ -67,6 +67,17 @@ class DetailViewModel @Inject constructor(
                     _item.value = foundItem
                     
                     foundItem?.let { item ->
+                        // Incrementar el contador de visitas (views_count).
+                        // Se escribe usando las CLAVES reales de Firebase (tabla y item),
+                        // que pueden no coincidir con el nombre de la tabla o el campo id.
+                        val tableKey = category?.key ?: categoryName
+                        val itemKey = item.key ?: itemId
+                        val currentViews = item.viewsCount?.toLongOrNull() ?: 0L
+                        val newViews = (currentViews + 1).toString()
+                        repository.incrementViews(tableKey, itemKey, newViews)
+                        // Reflejar el contador en la UI de inmediato
+                        _item.value = item.copy(viewsCount = newViews)
+
                         // Actualizar tamaños de archivos si no están presentes
                         if (item.fileSize == null) {
                             val urls = item.downloadUrl?.split(",")?.map { it.trim() } ?: emptyList()

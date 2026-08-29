@@ -16,6 +16,8 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Close
@@ -32,6 +34,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,6 +71,19 @@ fun MainScreen(sharedViewModel: SharedViewModel) {
     val context = LocalContext.current
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+
+    // Si una notificación del chat pidió abrir la pestaña Mensajes
+    val openChatRequest by sharedViewModel.openChatRequest.collectAsState()
+    LaunchedEffect(openChatRequest) {
+        if (openChatRequest) {
+            navController.navigate(TopBarNavItem.Chat.route) {
+                launchSingleTop = true
+                restoreState = true
+                popUpTo(navController.graph.startDestinationId) { saveState = true }
+            }
+            sharedViewModel.consumeOpenChatRequest()
+        }
+    }
 
     DisposableEffect(Unit) {
         // For frequent UI sounds
@@ -166,14 +182,24 @@ fun TopBar(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val focusManager = LocalFocusManager.current
+    // En la pantalla de detalle se ocultan las pestañas y se muestra "volver"
+    val isDetailRoute = currentRoute?.startsWith("detail/") == true
 
     val topBarItems = listOf(
         TopBarNavItem.Home,
-        TopBarNavItem.Chat
+        TopBarNavItem.Chat,
+        TopBarNavItem.Add
     )
 
     Column {
         TopAppBar(
+            navigationIcon = {
+                if (isDetailRoute) {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                    }
+                }
+            },
             title = {
                 if (isSearchActive) {
                     BasicTextField(
@@ -242,7 +268,7 @@ fun TopBar(
                 containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
             )
         )
-        if (!isSearchActive) {
+        if (!isSearchActive && !isDetailRoute) {
             TabRow(
                 selectedTabIndex = topBarItems.indexOfFirst { it.route == currentRoute }.coerceAtLeast(0),
                 containerColor = MaterialTheme.colorScheme.surface
@@ -290,6 +316,7 @@ sealed class TopBarNavItem(
 ) {
     object Home : TopBarNavItem("home", iconDrawable = R.drawable.ic_mando)
     object Chat : TopBarNavItem("chat", iconDrawable = R.drawable.ic_chat)
+    object Add : TopBarNavItem("add", iconVector = Icons.Default.AddCircle)
 }
 
 @Preview(showBackground = true)

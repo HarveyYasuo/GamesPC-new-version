@@ -35,6 +35,7 @@ import com.harvey.gamespc.ui.MainScreen
 import com.harvey.gamespc.ui.theme.GamesPCTheme
 import com.harvey.gamespc.ui.version.VersionCheckState
 import com.harvey.gamespc.ui.version.VersionViewModel
+import com.harvey.gamespc.utils.ChatUiState
 import com.harvey.gamespc.utils.ProvideSafeFocusManager
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -56,8 +57,22 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        // La actividad ya estaba abierta: redirigir a la pestaña del chat
+        if (intent.getBooleanExtra(ChatUiState.EXTRA_OPEN_CHAT, false)) {
+            sharedViewModel.requestOpenChat()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Si la app se abrió desde una notificación del chat, ir a esa pestaña
+        if (intent.getBooleanExtra(ChatUiState.EXTRA_OPEN_CHAT, false)) {
+            sharedViewModel.requestOpenChat()
+        }
 
         // Borde a borde en todas las versiones (Android 15+ lo impone para
         // targetSdk 35+; enableEdgeToEdge da retrocompatibilidad).

@@ -19,6 +19,9 @@ class ChatRepository @Inject constructor(
     private val chatRef = databaseReference.child("chat")
     private val typingRef = databaseReference.child("typing")
 
+    // Solo se cargan los últimos mensajes para no leer todo el historial
+    private val MAX_MESSAGES = 200
+
     fun getMessages(): Flow<List<Message>> = callbackFlow {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -36,7 +39,7 @@ class ChatRepository @Inject constructor(
                 close(error.toException())
             }
         }
-        chatRef.addValueEventListener(listener)
+        chatRef.orderByKey().limitToLast(MAX_MESSAGES).addValueEventListener(listener)
         awaitClose { chatRef.removeEventListener(listener) }
     }
 

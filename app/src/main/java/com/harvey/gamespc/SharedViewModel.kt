@@ -3,12 +3,16 @@ package com.harvey.gamespc
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.harvey.gamespc.data.GameItem
 import com.harvey.gamespc.data.GameTable
 import com.harvey.gamespc.data.repository.FirebaseGameRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,6 +35,17 @@ class SharedViewModel @Inject constructor(
 
     private val _pipModeState = MutableStateFlow(false)
     val pipModeState: StateFlow<Boolean> = _pipModeState
+
+    // Señal para refrescar el Home cuando se agrega contenido desde la pestaña "Agregar"
+    private val _contentVersion = MutableStateFlow(0)
+    val contentVersion: StateFlow<Int> = _contentVersion.asStateFlow()
+
+    // Petición para abrir la pestaña del chat (notificaciones)
+    private val _openChatRequest = MutableStateFlow(false)
+    val openChatRequest: StateFlow<Boolean> = _openChatRequest.asStateFlow()
+
+    // Limita a 4 peticiones de tamaño simultáneas para no saturar la red al abrir
+    private val sizeFetchSemaphore = Semaphore(4)
 
     init {
         fetchItems()
@@ -65,8 +80,10 @@ class SharedViewModel @Inject constructor(
                 item.downloadUrl?.let { url ->
                     if (item.fileSize == null) { // Only fetch if not already present
                         viewModelScope.launch {
-                            val fileSize = repository.fetchItemFileSize(url)
-                            updateItemFileSize(table.name, item.id, fileSize)
+                            sizeFetchSemaphore.withPermit {
+                                val fileSize = repository.fetchItemFileSize(url)
+                                updateItemFileSize(table, item, fileSize)
+                            }
                         }
                     }
                 }
@@ -74,11 +91,12 @@ class SharedViewModel @Inject constructor(
         }
     }
 
-    private fun updateItemFileSize(tableName: String?, itemId: String?, fileSize: String?) {
-        if (tableName == null || itemId == null || fileSize == null) return
-        
+    private fun updateItemFileSize(table: GameTable, item: GameItem, fileSize: String?) {
+        val itemId = item.id ?: return
+        if (fileSize == null) return
+
         _items.value = _items.value.map { currentTable ->
-            if (currentTable.name == tableName) {
+            if (currentTable.name == table.name) {
                 val updatedData = currentTable.data?.map { currentItem ->
                     if (currentItem.id == itemId) {
                         currentItem.copy(fileSize = fileSize)
@@ -91,6 +109,11 @@ class SharedViewModel @Inject constructor(
                 currentTable
             }
         }
+
+        // Persistir el tamaño en Firebase con las claves reales (tabla e item)
+        val tableKey = table.key ?: return
+        val itemKey = item.key ?: itemId
+        repository.saveFileSize(tableKey, itemKey, fileSize)
     }
 
     fun searchItems(query: String) {
@@ -106,5 +129,19 @@ class SharedViewModel @Inject constructor(
 
     fun setPipMode(enabled: Boolean) {
         _pipModeState.value = enabled
+    }
+
+    /** Se llama cuando la pestaña "Agregar" guarda contenido nuevo. */
+    fun notifyContentAdded() {
+        _contentVersion.value += 1
+    }
+
+    /** Se llama desde MainActivity cuando una notificación de chat se toca. */
+    fun requestOpenChat() {
+        _openChatRequest.value = true
+    }
+
+    fun consumeOpenChatRequest() {
+        _openChatRequest.value = false
     }
 }

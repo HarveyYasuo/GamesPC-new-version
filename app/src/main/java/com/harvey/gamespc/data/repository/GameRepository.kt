@@ -14,6 +14,17 @@ interface GameRepository {
      * Obtiene el tamaño de un archivo dado su URL.
      */
     suspend fun fetchItemFileSize(downloadUrl: String): String?
+
+    /**
+     * Guarda el tamaño de archivo calculado en la base de datos para no
+     * volver a pedirlo en el siguiente arranque.
+     */
+    fun saveFileSize(tableName: String, itemId: String, size: String)
+
+    /**
+     * Actualiza el contador de visitas de un item.
+     */
+    fun incrementViews(tableName: String, itemId: String, newCount: String)
 }
 
 /**

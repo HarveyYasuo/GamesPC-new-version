@@ -20,8 +20,8 @@ android {
         applicationId = "com.harvey.gamespc"
         minSdk = 23
         targetSdk = 36
-        versionCode = 61
-        versionName = "1.1.6"
+        versionCode = 62
+        versionName = "1.1.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
