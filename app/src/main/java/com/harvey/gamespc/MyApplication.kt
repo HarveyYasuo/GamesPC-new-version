@@ -60,10 +60,9 @@ class MyApplication : Application(), SingletonImageLoader.Factory, LifecycleEven
                 }
             }
 
-        // Initialize Google Mobile Ads SDK
-        MobileAds.initialize(this) { initializationStatus ->
-            Log.d("MyApplication", "Mobile Ads SDK initialized with status: $initializationStatus")
-        }
+        // Mobile Ads se inicializa en MainActivity después de recoger el
+        // consentimiento (UMP), y con el consentimiento de Unity Ads ya aplicado.
+        // No inicializar aquí para no arrancar Unity Ads antes del consentimiento.
 
         // Global AdMob Policy Compliance: Ensure ads are family-friendly and COPPA compliant
         // This is necessary to reach the "widest possible audience" (General Audience/Families)

@@ -129,13 +129,16 @@ class MainActivity : ComponentActivity() {
 
     private fun setUnityAdsConsent() {
         val canRequestAds = consentInformation.canRequestAds()
-        
-        // Use the new Unity Ads Privacy API instead of deprecated MetaData
+
+        // El consentimiento de Unity Ads debe fijarse ANTES de inicializar
+        // Mobile Ads / el adapter de Unity para que la primera petición lo respete.
         UnityAds.userConsent = canRequestAds
         UnityAds.userOptOut = !canRequestAds
+        // nonBehavioral = true es intencional: la app es para todos los públicos
+        // (COPPA / child-directed), por lo que no se usan anuncios personalizados.
         UnityAds.nonBehavioral = true
 
-        // Initialize Mobile Ads after setting Unity Ads metadata
+        // Inicializa Mobile Ads (y Unity Ads vía su adapter) ya con el consentimiento aplicado.
         MobileAds.initialize(this) {
             // Carga y muestra el anuncio de apertura (App Open) al iniciar la app
             if (canRequestAds) {
