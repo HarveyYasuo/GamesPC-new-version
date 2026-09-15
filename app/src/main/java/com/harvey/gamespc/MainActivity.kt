@@ -31,6 +31,7 @@ import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import com.unity3d.ads.UnityAds
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.harvey.gamespc.ads.AppOpenAdManager
 import com.harvey.gamespc.ui.MainScreen
 import com.harvey.gamespc.ui.theme.GamesPCTheme
 import com.harvey.gamespc.ui.version.VersionCheckState
@@ -135,7 +136,14 @@ class MainActivity : ComponentActivity() {
         UnityAds.nonBehavioral = true
 
         // Initialize Mobile Ads after setting Unity Ads metadata
-        MobileAds.initialize(this) {}
+        MobileAds.initialize(this) {
+            // Carga y muestra el anuncio de apertura (App Open) al iniciar la app
+            if (canRequestAds) {
+                AppOpenAdManager.loadAd(this) {
+                    AppOpenAdManager.showAdIfAvailable(this)
+                }
+            }
+        }
     }
 
     @Composable
