@@ -67,11 +67,15 @@ class MyApplication : Application(), SingletonImageLoader.Factory, LifecycleEven
 
         // Global AdMob Policy Compliance: Ensure ads are family-friendly and COPPA compliant
         // This is necessary to reach the "widest possible audience" (General Audience/Families)
-        val requestConfiguration = MobileAds.getRequestConfiguration().toBuilder()
+        val requestConfigurationBuilder = MobileAds.getRequestConfiguration().toBuilder()
             .setTagForChildDirectedTreatment(com.google.android.gms.ads.RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE)
             .setMaxAdContentRating(com.google.android.gms.ads.RequestConfiguration.MAX_AD_CONTENT_RATING_G)
-            .build()
-        MobileAds.setRequestConfiguration(requestConfiguration)
+
+        // En DEBUG registra dispositivos de prueba para no generar tráfico inválido
+        if (BuildConfig.DEBUG) {
+            requestConfigurationBuilder.setTestDeviceIds(listOf("8B49802DD625B2C713CB0D02DA1B4247"))
+        }
+        MobileAds.setRequestConfiguration(requestConfigurationBuilder.build())
 
     }
 
