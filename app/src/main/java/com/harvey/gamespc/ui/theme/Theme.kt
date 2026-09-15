@@ -82,8 +82,19 @@ fun GamesPCTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
-    
 
+    // Mantiene los iconos de las barras del sistema legibles según el tema,
+    // ya que WindowCompat.enableEdgeToEdge no ajusta su apariencia.
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            WindowCompat.getInsetsController(window, view).apply {
+                isAppearanceLightStatusBars = !darkTheme
+                isAppearanceLightNavigationBars = !darkTheme
+            }
+        }
+    }
 
     MaterialTheme(
         colorScheme = colorScheme,
